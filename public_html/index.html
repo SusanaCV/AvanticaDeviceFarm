@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
+        <script src="Controller.js"></script>
+        <link rel="stylesheet" href="Styles.css">
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body  ng-app="myApp" ng-controller="myCtrl">
+        <div class="container">
+
+            <div class="row" >
+                <div class="itemStyle col-sm-3" id="element{{$index}}" ng-repeat="item in DeviceList track by $index"
+                     ng-click="expand($index,item)" >
+
+                    <div  style="padding:0px;max-width: 200px;min-width: 200px" >
+                        <p class="textCenter"><b>{{item.name}}</b></p>
+                        <img   src="{{item.src}}">
+                        <p class="textCenter"><b>{{item.status}}</b></p>
+                    </div>       
+                    <div  style="position:absolute ;top:0px;left: 200px;max-width: 150px;min-width: 150px">
+                        <p class=""><b>Feactures</b></p>
+                        <p ng-repeat="(key, value) in item.feactures"><b>{{key+": "}}</b>{{value}}</p>
+                    </div>  
+                    <div  style="position:absolute ;top:0px;right:0px;left: 350px;max-width: 150px;min-width: 150px">
+                          <p class=""><b>Reservation</b></p>
+                          <input type="text" placeholder="Time in hours" class="form-control" id="Time+{{$index}}">
+                          <br>
+                        <button type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-ok"></span> Asing me 
+                        </button>
+                    </div>  
+                </div>
+            </div>                
+        </div>
+    </body>
+</html>
