@@ -7,8 +7,10 @@ and open the template in the editor.
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
-        <script src="Controller.js"></script>
+        <script src="Controler.js"></script>
+        <script src="ModalControler.js"></script>
         <link rel="stylesheet" href="Styles.css">
+        <link rel="stylesheet" href="ModalStyles.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -21,21 +23,22 @@ and open the template in the editor.
 
             <div class="row" >
                 <div class="itemStyle col-sm-3" id="element{{$index}}" ng-repeat="item in DeviceList track by $index"
-                     ng-click="expand($index,item)" >
+                     >
 
-                    <div  style="padding:0px;max-width: 200px;min-width: 200px" >
+                    <div   ng-click="expand($index, item)" style="padding:0px;max-width: 200px;min-width: 200px" >
                         <p class="textCenter"><b>{{item.name}}</b></p>
                         <img   src="{{item.src}}">
-                        <p class="textCenter"><b>{{item.status}}</b></p>
+                        <p class="textCenter"><b>{{item.status}}</b>{{" "+item.currentUser}}</p>                        
+                        
                     </div>       
                     <div  style="position:absolute ;top:0px;left: 200px;max-width: 150px;min-width: 150px">
                         <p class=""><b>Feactures</b></p>
                         <p ng-repeat="(key, value) in item.feactures"><b>{{key+": "}}</b>{{value}}</p>
                     </div>  
                     <div  style="position:absolute ;top:0px;right:0px;left: 350px;max-width: 150px;min-width: 150px">
-                          <p class=""><b>Reservation</b></p>
-                          <input type="text" placeholder="Time in hours" class="form-control" id="Time+{{$index}}">
-                          <br>
+                        <p class=""><b>Reservation</b></p>
+                        <input type="text" placeholder="Time in hours" class="form-control" id="Time+{{$index}}">
+                        <br>
                         <button type="button" class="btn btn-default btn-sm">
                             <span class="glyphicon glyphicon-ok"></span> Asing me 
                         </button>
@@ -43,5 +46,43 @@ and open the template in the editor.
                 </div>
             </div>                
         </div>
+        <!-- The Modal -->
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <span ng-click="close()" class="close">&times;</span>
+                    <h2>Device Stack</h2>
+                </div>
+                <div class="modal-body">
+                    <div   ng-click="expand($index, item)" style="padding:0px;max-width: 200px;min-width: 200px" >
+                        <p class="textCenter"><b>{{item.name}}</b></p>
+                        <img   src="{{DeviceSrc}}">
+                        <p class="textCenter"><b>{{item.status}}</b></p>
+                    </div>       
+                    <div  style="position:absolute ;top:0px;left: 200px;max-width: 300px;min-width: 300px">
+                        <p class=""><b>Stack</b></p>
+                        <div ng-repeat="value in Stack | priorityOrder:priority">
+                            <b>Name: </b>{{value.name}}
+                            <b>Time: </b>{{value.time+"h"}}
+                            <b>priority: </b>{{value.priority}}
+                        </div>
+                    </div> 
+                    <div  style="position:absolute ;top:0px;right:0px;left: 500px;max-width: 150px;min-width: 150px">
+                        <p class=""><b>Feactures</b></p>
+                        <p ng-repeat="(key, value) in feactures"><b>{{key+": "}}</b>{{value}}</p>
+                        <button type="button" class="btn btn-default btn-sm">
+                            <span class="glyphicon glyphicon-ok"></span> add me to stack
+                        </button>
+                    </div>  
+                </div>
+                <div class="modal-footer">
+                    <h3>Divice {{name}} availe in {{totalTime}} hours</h3>
+                </div>
+            </div>
+
+        </div>
+
     </body>
 </html>
