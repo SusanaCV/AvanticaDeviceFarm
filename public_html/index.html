@@ -11,6 +11,7 @@ and open the template in the editor.
         <script src="ModalControler.js"></script>
         <link rel="stylesheet" href="Styles.css">
         <link rel="stylesheet" href="ModalStyles.css">
+        <link rel="stylesheet" href="LoginStyle.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -19,30 +20,50 @@ and open the template in the editor.
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body  ng-app="myApp" ng-controller="myCtrl">
-        <div class="container">
+        <nav ng-if="user != 'Sign Up'" class="navbar navbar-inverse">
+            <div class="container-fluid">
+                <div class="navbar-header">
+                    <a class="navbar-brand" href="#">Device Farm</a>
+
+                </div>
+                <ul class="nav navbar-nav">
+                    <li style="top:7px;"> <input ng-model="search.$" type="text" class="form-control"  placeholder="Search"></li>
+                </ul>
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a  ><span class="glyphicon glyphicon-user"></span>{{user}}</a></li>
+                    <li>
+                        <a  ><span class="glyphicon glyphicon-log-out"></span> LogOut</a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+        <!--LOGIN-->
+        <div ng-if="user == 'Sign Up'" class="modal-dialog">
+            <div class="loginmodal-container">
+                <h1>Login to Your Account</h1>
+
+                <hr>
+                <form>
+                    <input type="text"  id="user" placeholder="Username">
+                    <input type="password" id="pass" placeholder="Password">
+                    <input type="submit" name="login" ng-click="login()" class="login loginmodal-submit" value="Login">
+                </form>
+
+            </div>
+        </div>
+        <!--HOME-->
+        <div ng-if="user != 'Sign Up'" class="container">
 
             <div class="row" >
-                <div class="itemStyle col-sm-3" id="element{{$index}}" ng-repeat="item in DeviceList track by $index"
-                     >
+                <div 
+                    class="itemStyle col-sm-3" id="element{{$index}}"
+                    ng-repeat="item in DeviceList| filter : search  "
+                    ng-click="expand($index, item)" >
+                    <p class=" textCenter"><b>{{item.name + "[" + item.feactures.brand + " " + item.feactures.model + "]"}}</b></p>
+                    <img class="col-sm-12" alt="" src="{{item.src}}">
+                    <p class="textCenter"><b>{{item.status}}</b>{{" " + item.currentUser}}</p>                        
 
-                    <div   ng-click="expand($index, item)" style="padding:0px;max-width: 200px;min-width: 200px" >
-                        <p class="textCenter"><b>{{item.name}}</b></p>
-                        <img   src="{{item.src}}">
-                        <p class="textCenter"><b>{{item.status}}</b>{{" "+item.currentUser}}</p>                        
-                        
-                    </div>       
-                    <div  style="position:absolute ;top:0px;left: 200px;max-width: 150px;min-width: 150px">
-                        <p class=""><b>Feactures</b></p>
-                        <p ng-repeat="(key, value) in item.feactures"><b>{{key+": "}}</b>{{value}}</p>
-                    </div>  
-                    <div  style="position:absolute ;top:0px;right:0px;left: 350px;max-width: 150px;min-width: 150px">
-                        <p class=""><b>Reservation</b></p>
-                        <input type="text" placeholder="Time in hours" class="form-control" id="Time+{{$index}}">
-                        <br>
-                        <button type="button" class="btn btn-default btn-sm">
-                            <span class="glyphicon glyphicon-ok"></span> Asing me 
-                        </button>
-                    </div>  
+
                 </div>
             </div>                
         </div>
@@ -51,34 +72,60 @@ and open the template in the editor.
 
             <!-- Modal content -->
             <div class="modal-content">
-                <div class="modal-header">
+                <div ng-class="whatClassIsIt(CurrentItem.status)" class="modal-header">
                     <span ng-click="close()" class="close">&times;</span>
                     <h2>Device Stack</h2>
                 </div>
                 <div class="modal-body">
-                    <div   ng-click="expand($index, item)" style="padding:0px;max-width: 200px;min-width: 200px" >
-                        <p class="textCenter"><b>{{item.name}}</b></p>
-                        <img   src="{{DeviceSrc}}">
-                        <p class="textCenter"><b>{{item.status}}</b></p>
-                    </div>       
-                    <div  style="position:absolute ;top:0px;left: 200px;max-width: 300px;min-width: 300px">
-                        <p class=""><b>Stack</b></p>
-                        <div ng-repeat="value in Stack | priorityOrder:priority">
-                            <b>Name: </b>{{value.name}}
-                            <b>Time: </b>{{value.time+"h"}}
-                            <b>priority: </b>{{value.priority}}
-                        </div>
-                    </div> 
-                    <div  style="position:absolute ;top:0px;right:0px;left: 500px;max-width: 150px;min-width: 150px">
-                        <p class=""><b>Feactures</b></p>
-                        <p ng-repeat="(key, value) in feactures"><b>{{key+": "}}</b>{{value}}</p>
-                        <button type="button" class="btn btn-default btn-sm">
-                            <span class="glyphicon glyphicon-ok"></span> add me to stack
-                        </button>
-                    </div>  
+                    <div class="container">
+
+                        <div class="row" >
+                            <div class=" col-sm-2"  >
+                                <p class="textCenter"><b>{{CurrentItem.name}}</b></p>
+                                <div >
+                                    <img alt=""  class="displayed"  src="{{CurrentItem.src}}" style=" padding: auto;max-width: 200px">
+
+                                </div>
+                                <p class="textCenter"><b>{{CurrentItem.status}}</b></p>
+                            </div>  
+                            <div class=" col-sm-3" >
+                                <p class=""><b>Feactures</b></p>
+                                <table class="table">
+                                    <tr  ng-repeat="(key, value) in CurrentItem.feactures"><th><b>{{key+": "}}</b></th><th> {{ value}}</th></tr>                            
+                                </table>
+
+                            </div>  
+                            <div class=" col-sm-2">
+                                <p class=""><b>Reservation</b></p>
+                                <input type="number" id="requestTime" placeholder="Time in hours" class="form-control" >
+                                <br>
+                                <select id="requestPriority" class="form-control">
+                                    <option value="Hihg">High</option>
+                                    <option value="Meduim">Medium</option>
+                                    <option value="Low">Low</option>
+                                </select>
+                                <br>
+                                <button type="button" ng-click="AsigMe()" class="btn btn-default btn-sm">
+                                    <span class="glyphicon glyphicon-ok"></span> Asing me 
+                                </button>
+                            </div>  
+
+                            <div class=" col-sm-4">
+                                <p class=""><b>Stack</b></p>
+
+                                <table class="table">
+                                    <tr ng-repeat=" value in CurrentItem.stack| priorityOrder : priority" >
+                                        <th>{{"Name: "+value.name}}</th>
+                                        <th>{{"Time: "+value.time + "h"}}</th>
+                                        <th>{{"priority: "+value.priority}}</th>
+                                    </tr>                            
+                                </table>
+                            </div> 
+                        </div> 
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <h3>Divice {{name}} availe in {{totalTime}} hours</h3>
+                <div ng-class="whatClassIsIt(CurrentItem.status)" class="modal-footer">
+                    <h3>Divice {{CurrentItem.name}} available in {{totalTime}} hours</h3>
                 </div>
             </div>
 

@@ -1,51 +1,65 @@
 var app = angular.module("myApp", []);
-app.controller("myCtrl", function ($scope) {
-    $scope.DeviceSrc = "";
-    $scope.Stack = [];//name,hours,priority
-    $scope.feactures = [];
-    $scope.name = "";
+app.controller("myCtrl", function ($scope, $http) {
+    $scope.CurrentItem = "";
     $scope.totalTime = 0;
+$scope.user="Sign Up";
     $scope.DeviceList = [
-        {name: "Samsumg S7", currentUser: "Keneth", status: "In use by ", src: "Smartphone.jpg",
-            stack: [
-                {name: "jimmy", time: 2, priority: "high"},
-                {name: "susana", time: 5, priority: "low"},
-                {name: "jimmy", time: 2, priority: "medium"}],
-            feactures: {modelo: "samsum", andoid: "4.3", tamaño: "10"}},
-        {name: "Samsumg S5", status: "Available", src: "Smartphone.jpg", stack: [{name: "jimmy", time: 2, priority: "high"}], feactures: {modelo: "samsum", andoid: "4.3", tamaño: "10"}},
-        {name: "Samsumg note", status: "Bussy", src: "Smartphone.jpg", stack: [{name: "jimmy", time: 2, priority: "high"}], feactures: {modelo: "samsum", andoid: "4.3", tamaño: "10"}},
-        {name: "Samsumg", status: "Bussy", src: "Smartphone.jpg", stack: [{name: "jimmy", time: 2, priority: "high"}], feactures: {modelo: "samsum", andoid: "4.3", tamaño: "10"}}
-
     ];
+    $scope.load = function () {
+        $http.get('http://localhost:8080/device').
+                then(function (response) {
+                    console.log(response.data);
+                    $scope.DeviceList = response.data;
+                });
+    };
+    $scope.load();
+     $scope.login = function () {
+       console.log(
+         document.getElementById("user").value,
+         document.getElementById("pass").value);  
+     };
+    $scope.AsigMe = function () {
 
-    $scope.expand = function (index, item) {
-        var element = document.getElementById("element" + index);
-        if (item.status === "Available") {
+        var parameter = JSON.stringify({name: "user", time: 1, priority: "high"});
+        $http.post('http://localhost:8080/request', parameter).
+                then(function (data) {
+                    // this callback will be called asynchronously
+                    // when the response is available
+                    console.log(data);
+                    if(data.status===200){
+                        alert("Request Succesfull");
+                        $scope.load();
+                        $scope.close();
+                    }
+                }, function (error) {
+              alert("Request Failed");
+        });
 
-            if (element.style.width === "550px") {
-                element.style.width = "200px";
-                return;
-            }
-            element.style.maxWidth = "100%";
-            element.style.width = "550px";
-        } else {
+    };
+    $scope.expand = function (index) {
 
-            $scope.name = $scope.DeviceList[index].name;
-            $scope.DeviceSrc = $scope.DeviceList[index].src;
-            $scope.Stack = $scope.DeviceList[index].stack;
-            $scope.feactures = $scope.DeviceList[index].feactures;
-            $scope.totalTime = 0;
-            for (var item in $scope.Stack) {
-                $scope.totalTime = $scope.totalTime + $scope.Stack[item].time;
-            }
+        $scope.CurrentItem = $scope.DeviceList[index];
+        $scope.totalTime = 0;
+        angular.forEach($scope.CurrentItem.stack, function (item) {
 
-            var modal = document.getElementById('myModal');
-            modal.style.display = "block";
-        }
+            $scope.totalTime = $scope.totalTime + item.time;
+        });
+
+        document.getElementById('myModal').style.display = "block";
+
     };
     $scope.close = function () {
         document.getElementById('myModal').style.display = "none";
     };
+    $scope.whatClassIsIt = function (someValue) {
+
+        if (someValue === "Bussy")
+            return "BG_Green";
+        else
+            return "BG_Blue";
+
+    };
+
     $scope.checkStatus = function (status) {
         if (status === "Bussy") {
             return true;
@@ -64,17 +78,18 @@ app.controller("myCtrl", function ($scope) {
     };
 
 
+
 });
 app.filter('priorityOrder', function () {
     function CustomOrder(item) {
         switch (item) {
-            case 'high':
+            case 'High':
                 return 1;
 
-            case 'medium':
+            case 'Medium':
                 return 2;
 
-            case 'low':
+            case 'Low':
                 return 3;
         }
     }
@@ -94,4 +109,5 @@ window.onclick = function (event) {
     if (event.target == modal) {
         modal.style.display = "none";
     }
+
 };

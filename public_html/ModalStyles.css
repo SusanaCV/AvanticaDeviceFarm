@@ -4,7 +4,7 @@
     display: none; /* Hidden by default */
     position: fixed; /* Stay in place */
     z-index: 1; /* Sit on top */
-    padding-top: 100px; /* Location of the box */
+    padding-top: 50px; /* Location of the box */
     left: 0;
     top: 0;
     width: 100%; /* Full width */
@@ -21,14 +21,20 @@
     margin: auto;
     padding: 0;
     border: 1px solid #888;
-    width: 80%;
+    overflow-x:  hidden;
+    overflow-y:  scroll;
+    width: 90%;
+    max-height: 95%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
     animation-name: animatetop;
     animation-duration: 0.4s
 }
-
+.displayed {
+    display: block;
+    margin-left: auto;
+    margin-right: auto }
 /* Add Animation */
 @-webkit-keyframes animatetop {
     from {top:-300px; opacity:0} 
@@ -57,15 +63,22 @@
 
 .modal-header {
     padding: 2px 16px;
-    background-color: #5cb85c;
     color: white;
 }
 
-.modal-body {padding: 2px 16px;}
-
-.modal-footer {
+.modal-body {
     padding: 2px 16px;
+min-height:  300px;   
+}
+.BG_Blue{    
+    background-color: #5c5cb8;
+}
+.BG_Green{    
     background-color: #5cb85c;
+}
+.modal-footer {
+    
+    padding: 2px 16px;
     color: white;
     text-align: center !important;
 }
