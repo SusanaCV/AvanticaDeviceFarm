@@ -2,7 +2,7 @@ var app = angular.module("myApp", []);
 app.controller("myCtrl", function ($scope, $http) {
     $scope.CurrentItem = "";
     $scope.totalTime = 0;
-$scope.user="Sign Up";
+    $scope.user = "";
     $scope.DeviceList = [
     ];
     $scope.load = function () {
@@ -13,11 +13,29 @@ $scope.user="Sign Up";
                 });
     };
     $scope.load();
-     $scope.login = function () {
-       console.log(
-         document.getElementById("user").value,
-         document.getElementById("pass").value);  
-     };
+    $scope.login = function () {
+
+
+         $.ajax({url: 'http://localhost:8080/login',
+              type: 'GET',
+            data: { username: document.getElementById("user").value,
+                password : document.getElementById("pass").value} ,
+            success: function(result){
+             $scope.user = result;
+             console.log("Succes");$scope.$apply();
+        },
+                error: function(result) {
+                    alert("Data not found");
+                }
+    });
+       
+
+
+    };
+    $scope.logout = function () {
+          $scope.user = "";
+    };
+    
     $scope.AsigMe = function () {
 
         var parameter = JSON.stringify({name: "user", time: 1, priority: "high"});
@@ -26,14 +44,14 @@ $scope.user="Sign Up";
                     // this callback will be called asynchronously
                     // when the response is available
                     console.log(data);
-                    if(data.status===200){
+                    if (data.status === 200) {
                         alert("Request Succesfull");
                         $scope.load();
                         $scope.close();
                     }
                 }, function (error) {
-              alert("Request Failed");
-        });
+                    alert("Request Failed");
+                });
 
     };
     $scope.expand = function (index) {
