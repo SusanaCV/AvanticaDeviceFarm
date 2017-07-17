@@ -1,8 +1,9 @@
 var app = angular.module("myApp", []);
-app.controller("myCtrl", function ($scope, $http) {
+app.controller("myCtrl", function ($scope, $window, $http) {
     $scope.CurrentItem = "";
     $scope.totalTime = 0;
     $scope.user = "";
+    $scope.id = 0;
     $scope.DeviceList = [
     ];
     $scope.load = function () {
@@ -12,46 +13,54 @@ app.controller("myCtrl", function ($scope, $http) {
                     $scope.DeviceList = response.data;
                 });
     };
-    $scope.load();
     $scope.login = function () {
 
 
-         $.ajax({url: 'http://localhost:8080/login',
-              type: 'GET',
-            data: { username: document.getElementById("user").value,
-                password : document.getElementById("pass").value} ,
-            success: function(result){
-             $scope.user = result;
-             console.log("Succes");$scope.$apply();
-        },
-                error: function(result) {
-                    alert("Data not found");
-                }
-    });
-       
+        $.ajax({url: 'http://localhost:8080/login',
+            type: 'GET',
+            data: {username: document.getElementById("user").value,
+                password: document.getElementById("pass").value},
+            success: function (result) {
+                $scope.user = result.name;
+                $scope.id = result.id;
+                $scope.Permission = result.permision;
+                console.log(result);
+                $scope.load();
+                $scope.$apply();
+            },
+            error: function (result) {
+                alert("Data not found");
+            }
+        });
+
 
 
     };
     $scope.logout = function () {
-          $scope.user = "";
+        $scope.user = "";
     };
-    
+
     $scope.AsigMe = function () {
 
-        var parameter = JSON.stringify({name: "user", time: 1, priority: "high"});
-        $http.post('http://localhost:8080/request', parameter).
-                then(function (data) {
-                    // this callback will be called asynchronously
-                    // when the response is available
-                    console.log(data);
-                    if (data.status === 200) {
-                        alert("Request Succesfull");
-                        $scope.load();
-                        $scope.close();
-                    }
-                }, function (error) {
-                    alert("Request Failed");
-                });
+        $.ajax({url: 'http://localhost:8080/request',
+            type: 'POST',
+            data: {
+                idUser: $scope.id,
+                idDevice: $scope.CurrentItem.id,
+                time: document.getElementById("requestTime").value,
+                priority: document.getElementById("requestPriority").value
+            },
+            success: function (result) {
+                alert("Request Succesfull");
+                document.getElementById("requestTime").value = "";
+                $scope.load();
+                $scope.close();
+            },
+            error: function (result) {
+                alert("Request Failed");
+            }
+        });
+
 
     };
     $scope.expand = function (index) {
@@ -95,18 +104,88 @@ app.controller("myCtrl", function ($scope, $http) {
         // code to hide the div
     };
 
+    $scope.delete = function (index) {
+        console.log($scope.DeviceList[index].id);
+
+        $.ajax({url: 'http://localhost:8080/delete',
+            type: 'POST',
+            data: {id: $scope.DeviceList[index].id},
+            success: function (result) {
+                $scope.load();
+            },
+            error: function (result) {
+                alert("delete fail");
+            }
+        });
+    };
+$scope.free = function (index) {
+
+        $.ajax({url: 'http://localhost:8080/free',
+            type: 'POST',
+            data: {id: $scope.DeviceList[index].id},
+            success: function (result) {
+                $scope.load();
+            },
+            error: function (result) {
+                alert("delete fail");
+            }
+        });
+    };
+    $scope.NewDevice = function () {
+
+        $.ajax({url: 'http://localhost:8080/NewDevice',
+            type: 'POST',
+            data: {code: document.getElementById("code").value,
+                img: $window.imagen,
+                brand: document.getElementById("brand").value,
+                model: document.getElementById("model").value,
+                os: document.getElementById("os").value,
+                version: document.getElementById("version").value,
+                ip: document.getElementById("ip").value,
+                mac: document.getElementById("mac").value},
+            success: function (result) {
+                document.getElementById("code").value = "";
+                $window.imagen = "";
+                document.getElementById("prev").src = "";
+                document.getElementById("brand").value = "";
+                document.getElementById("model").value = "";
+                document.getElementById("os").value = "";
+                document.getElementById("version").value = "";
+                document.getElementById("ip").value = "";
+                document.getElementById("mac").value = "";
+                $scope.load();
+            },
+            error: function (result) {
+                alert("New device not insert");
+            }
+        });
 
 
+    };
+    $scope.give = function (id){
+        $.ajax({url: 'http://localhost:8080/give',
+            type: 'POST',
+            data: {
+                id: id
+            },
+            success: function (result) {
+                alert("Request Succesfull");
+                $scope.load();
+                $scope.close();
+            },
+            error: function (result) {
+                alert("Request Failed");
+            }
+        });
+    };
 });
 app.filter('priorityOrder', function () {
     function CustomOrder(item) {
         switch (item) {
             case 'High':
                 return 1;
-
             case 'Medium':
                 return 2;
-
             case 'Low':
                 return 3;
         }
@@ -121,6 +200,8 @@ app.filter('priorityOrder', function () {
         });
         return filtered;
     };
+
+
 });
 window.onclick = function (event) {
     var modal = document.getElementById('myModal');
@@ -129,3 +210,20 @@ window.onclick = function (event) {
     }
 
 };
+var imagen;
+function readFile() {
+
+    if (this.files && this.files[0]) {
+
+        var FR = new FileReader();
+
+        FR.addEventListener("load", function (e) {
+            console.log(e.target.result);
+            imagen = e.target.result;
+            document.getElementById("prev").src = imagen;
+        });
+
+        FR.readAsDataURL(this.files[0]);
+    }
+
+}

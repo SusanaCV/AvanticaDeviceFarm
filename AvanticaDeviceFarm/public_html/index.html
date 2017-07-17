@@ -10,7 +10,6 @@ and open the template in the editor.
 
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
         <script src="Controler.js"></script>
-        <script src="ModalControler.js"></script>
         <link rel="stylesheet" href="Styles.css">
         <link rel="stylesheet" href="ModalStyles.css">
         <link rel="stylesheet" href="LoginStyle.css">
@@ -32,7 +31,7 @@ and open the template in the editor.
                     <li style="top:7px;"> <input ng-model="search.$" type="text" class="form-control"  placeholder="Search"></li>
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a  ><span class="glyphicon glyphicon-user"></span>{{" "+user}}</a></li>
+                    <li><a  ><span class="glyphicon glyphicon-user"></span>{{" " + user}}</a></li>
                     <li ng-click="logout()">
                         <a  ><span class="glyphicon glyphicon-log-out"></span> LogOut</a>
                     </li>
@@ -46,8 +45,8 @@ and open the template in the editor.
 
                 <hr>
                 <form>
-                    <input type="text"  id="user" placeholder="Username">
-                    <input type="password" id="pass" placeholder="Password">
+                    <input type="text" value="e@mail.com" id="user" placeholder="Email">
+                    <input type="password" value="123" id="pass" placeholder="Password">
                     <input type="submit" name="login" ng-click="login()" class="login loginmodal-submit" value="Login">
                 </form>
 
@@ -57,20 +56,69 @@ and open the template in the editor.
         <div ng-if="user !== ''" class="container">
 
             <div class="row" >
-                <div 
-                    class="itemStyle col-sm-3" id="element{{$index}}"
-                    ng-repeat="item in DeviceList| filter : search  "
-                    ng-click="expand($index, item)" >
-                    <p class=" textCenter"><b>{{item.name + "[" + item.feactures.brand + " " + item.feactures.model + "]"}}</b></p>
-                    <img class="col-sm-12" alt="" src="{{item.src}}">
-                    <p class="textCenter"><b>{{item.status}}</b>{{" " + item.currentUser}}</p>                        
-
+                <div class="itemStyle col-sm-6" ng-if="Permission === 1">
+                    <p>New Device</p>
+                    <table class="table">
+                        <tr>
+                            <th>Code:</th><th><input id="code" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>Image:</th>
+                            <th>
+                                <label class="btn btn-default btn-file">
+                                    Browse <input id="Imagen" type="file" style="display: none;" ng-model="editItem._attachments_uri.image" 
+                                                  accept="image/*" app-filereader />
+                                    <img alt src="" id="prev" >
+                                    <script>
+                                        document.getElementById("Imagen").addEventListener("change", readFile);
+                                    </script>
+                                </label>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>Brand:</th><th><input id="brand" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>Model:</th><th><input id="model" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>OS:</th><th><input id="os" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>Version:</th><th><input id="version" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>IP:</th><th><input id="ip" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>MAC Adress:</th><th><input id="mac" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th></th><th><input type="button" ng-click="NewDevice()" class="btn btn-primary" value="Add"  ></th>
+                        </tr>
+                    </table>
+                </div>
+                <div class="itemStyle col-sm-3" id="element{{$index}}"
+                    ng-repeat="item in DeviceList| filter : search.$  "
+                    >
+                    <div ng-click="expand($index)">
+                        <p class=" textCenter"><b>{{item.feactures.code + "[" + item.feactures.brand + " " + item.feactures.model + "]"}}</b></p>
+                        <img   class="col-sm-12" alt="" src="{{item.src}}">
+                        <p class="textCenter"><b>{{item.status}}</b>{{" " + item.name}}</p> 
+                    </div>                       
+                    <button ng-click="free($index)" type="button" style="width: 100%;" ng-if="Permission === 1" class="btn btn-default btn-sm">
+                        Free <span class="glyphicon glyphicon-transfer"></span>  
+                    </button>
+                                        
+                    <button ng-click="delete($index)" type="button" style="width: 100%;" ng-if="Permission === 1" class="btn btn-default btn-sm">
+                        Delete <span class="glyphicon glyphicon-remove"></span>  
+                    </button>
 
                 </div>
             </div>                
         </div>
         <!-- The Modal -->
-        <div id="myModal" class="modal">
+        <div  id="myModal" class="modal">
 
             <!-- Modal content -->
             <div class="modal-content">
@@ -82,7 +130,7 @@ and open the template in the editor.
                     <div class="container">
 
                         <div class="row" >
-                            <div class=" col-sm-2"  >
+                            <div class=" col-sm-3"  >
                                 <p class="textCenter"><b>{{CurrentItem.name}}</b></p>
                                 <div >
                                     <img alt=""  class="displayed"  src="{{CurrentItem.src}}" style=" padding: auto;max-width: 200px">
@@ -112,7 +160,7 @@ and open the template in the editor.
                                 </button>
                             </div>  
 
-                            <div class=" col-sm-4">
+                            <div class=" col-sm-3">
                                 <p class=""><b>Stack</b></p>
 
                                 <table class="table">
@@ -120,18 +168,22 @@ and open the template in the editor.
                                         <th>{{"Name: "+value.name}}</th>
                                         <th>{{"Time: "+value.time + "h"}}</th>
                                         <th>{{"priority: "+value.priority}}</th>
-                                    </tr>                            
+                                        <th ng-if="Permission === 1" ><input class="btn" type="button" ng-click="give(value.id)" value="Add" ></th>
+                                    </tr>    
+                                    
                                 </table>
                             </div> 
                         </div> 
                     </div>
                 </div>
                 <div ng-class="whatClassIsIt(CurrentItem.status)" class="modal-footer">
-                    <h3>Divice {{CurrentItem.name}} available in {{totalTime}} hours</h3>
+                    <h3>Divice {{CurrentItem.feactures.code}} available in {{totalTime}} hours</h3>
                 </div>
             </div>
 
         </div>
 
     </body>
+
+
 </html>

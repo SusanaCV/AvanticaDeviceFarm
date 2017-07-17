@@ -9,6 +9,12 @@ img{
     margin-right: auto
     
 }
+th input{
+   width: 100%; 
+}
+th label{
+   width: 100%; 
+}
 body{
     background: gray !important;
 }
