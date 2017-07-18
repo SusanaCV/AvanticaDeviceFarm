@@ -4,8 +4,9 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     $scope.totalTime = 0;
     $scope.user = "";
     $scope.id = 0;
-    $scope.DeviceList = [
-    ];
+    $scope.DeviceList = [];
+    
+    //Endpoint de dispositivos
     $scope.load = function () {
         $http.get('http://localhost:8080/device').
                 then(function (response) {
@@ -13,9 +14,9 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                     $scope.DeviceList = response.data;
                 });
     };
+    
+//Endpoint Login
     $scope.login = function () {
-
-
         $.ajax({url: 'http://localhost:8080/login',
             type: 'GET',
             data: {username: document.getElementById("user").value,
@@ -23,8 +24,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             success: function (result) {
                 $scope.user = result.name;
                 $scope.id = result.id;
-                $scope.Permission = result.permision;
-                console.log(result);
+                $scope.Permissioscope.n = result.permision;
                 $scope.load();
                 $scope.$apply();
             },
@@ -32,14 +32,13 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 alert("Data not found");
             }
         });
-
-
-
     };
+
+    //Cerra Sesion
     $scope.logout = function () {
         $scope.user = "";
     };
-
+//Endpoint de solicitud de dispositivos 
     $scope.AsigMe = function () {
 
         $.ajax({url: 'http://localhost:8080/request',
@@ -60,40 +59,40 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 alert("Request Failed");
             }
         });
-
-
     };
-    $scope.expand = function (index) {
 
+    //Expandir Modal y cargar los datos
+    $scope.expand = function (index) {
         $scope.CurrentItem = $scope.DeviceList[index];
         $scope.totalTime = 0;
         angular.forEach($scope.CurrentItem.stack, function (item) {
-
             $scope.totalTime = $scope.totalTime + item.time;
         });
 
         document.getElementById('myModal').style.display = "block";
-
     };
+
+    //Cerrar modal
     $scope.close = function () {
         document.getElementById('myModal').style.display = "none";
     };
+
+    //Verificar el estado para asignar color diferenciador
     $scope.whatClassIsIt = function (someValue) {
 
-        if (someValue === "Bussy")
+        if (someValue === "In use")
             return "BG_Green";
         else
             return "BG_Blue";
 
     };
-
+//Verificar el estado
     $scope.checkStatus = function (status) {
-        if (status === "Bussy") {
+        if (status === "In use") {
             return true;
         }
         return false;
     };
-
     onDocumentClick = function (event) {
 
         // check for flag
@@ -103,7 +102,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
         }
         // code to hide the div
     };
-
+    //Borrar dispositivo
     $scope.delete = function (index) {
         console.log($scope.DeviceList[index].id);
 
@@ -118,7 +117,8 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             }
         });
     };
-$scope.free = function (index) {
+    //Devolver el dispositivo
+    $scope.free = function (index) {
 
         $.ajax({url: 'http://localhost:8080/free',
             type: 'POST',
@@ -131,6 +131,7 @@ $scope.free = function (index) {
             }
         });
     };
+    //Agregar nuevo deispositivo 
     $scope.NewDevice = function () {
 
         $.ajax({url: 'http://localhost:8080/NewDevice',
@@ -159,10 +160,10 @@ $scope.free = function (index) {
                 alert("New device not insert");
             }
         });
-
-
     };
-    $scope.give = function (id){
+
+    //Asignacion de dispositivo
+    $scope.give = function (id) {
         $.ajax({url: 'http://localhost:8080/give',
             type: 'POST',
             data: {
@@ -179,6 +180,7 @@ $scope.free = function (index) {
         });
     };
 });
+//Filtra por prioridad
 app.filter('priorityOrder', function () {
     function CustomOrder(item) {
         switch (item) {
