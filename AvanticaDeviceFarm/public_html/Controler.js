@@ -5,7 +5,10 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     $scope.user = "";
     $scope.id = 0;
     $scope.DeviceList = [];
-    
+     $scope.print= function () {
+        
+  console.log($scope.asd);
+    };
     //Endpoint de dispositivos
     $scope.load = function () {
         $http.get('http://localhost:8080/device').
@@ -15,7 +18,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 });
     };
     
-//Endpoint Login
+    //Endpoint Login
     $scope.login = function () {
         $.ajax({url: 'http://localhost:8080/login',
             type: 'GET',
@@ -24,7 +27,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             success: function (result) {
                 $scope.user = result.name;
                 $scope.id = result.id;
-                $scope.Permissioscope.n = result.permision;
+                $scope.Permission = result.permision;
                 $scope.load();
                 $scope.$apply();
             },
@@ -38,7 +41,8 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     $scope.logout = function () {
         $scope.user = "";
     };
-//Endpoint de solicitud de dispositivos 
+    
+    //Endpoint de solicitud de dispositivos 
     $scope.AsigMe = function () {
 
         $.ajax({url: 'http://localhost:8080/request',
@@ -182,7 +186,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
 });
 //Filtra por prioridad
 app.filter('priorityOrder', function () {
-    function CustomOrder(item) {
+    function CustomOrder(item) { 
         switch (item) {
             case 'High':
                 return 1;
@@ -192,7 +196,7 @@ app.filter('priorityOrder', function () {
                 return 3;
         }
     }
-    return function (items, field) {
+    return function (items) {
         var filtered = [];
         angular.forEach(items, function (item) {
             filtered.push(item);
@@ -202,8 +206,6 @@ app.filter('priorityOrder', function () {
         });
         return filtered;
     };
-
-
 });
 window.onclick = function (event) {
     var modal = document.getElementById('myModal');
@@ -214,18 +216,13 @@ window.onclick = function (event) {
 };
 var imagen;
 function readFile() {
-
     if (this.files && this.files[0]) {
-
         var FR = new FileReader();
-
         FR.addEventListener("load", function (e) {
             console.log(e.target.result);
             imagen = e.target.result;
             document.getElementById("prev").src = imagen;
         });
-
         FR.readAsDataURL(this.files[0]);
     }
-
 }

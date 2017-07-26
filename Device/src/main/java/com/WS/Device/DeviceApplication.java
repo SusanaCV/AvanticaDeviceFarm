@@ -10,11 +10,7 @@ public class DeviceApplication {
             adClass ad = new adClass();
         
 
-        ad.getUserBasicAttributes(ad.pool("a"), ad.ADConeection());
-        ad.getUserBasicAttributes(ad.pool("e"), ad.ADConeection());
-        ad.getUserBasicAttributes(ad.pool("i"), ad.ADConeection());
-        ad.getUserBasicAttributes(ad.pool("o"), ad.ADConeection());
-        ad.getUserBasicAttributes(ad.pool("u"), ad.ADConeection());
+       
 		SpringApplication.run(DeviceApplication.class, args);
 	}
 }

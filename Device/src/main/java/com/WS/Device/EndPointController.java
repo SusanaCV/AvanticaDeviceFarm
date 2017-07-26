@@ -98,10 +98,14 @@ public class EndPointController {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-       User response = ConectionDB.login(username, password);
+      //  adClass ad = new adClass();
+      //  ad.getUserBasicAttributes(username,password, ad.ADConeection(username,password));        
+        
+       User response = ConectionDB.login(username);
        if(response==null){
-           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
-       }
+         
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+                    }     
         return ResponseEntity.ok(response);
     }
     

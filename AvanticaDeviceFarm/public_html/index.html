@@ -25,19 +25,26 @@ and open the template in the editor.
             <div class="container-fluid">
                 <div class="navbar-header">
                     <a class="navbar-brand" href="#">Device Farm</a>
-
                 </div>
                 <ul class="nav navbar-nav">
-                    <li style="top:7px;"> <input ng-model="search.$" type="text" class="form-control"  placeholder="Search"></li>
+                    <li  ng-if="Permission === 1" >
+                        <a  ><span class="glyphicon glyphicon-device"></span>Add Device</a>
+                    </li>  
+                    <li style="top:7px;">
+                        <input ng-model="$parent.search" type="text" class="form-control"  placeholder="Search">
+                    </li>     
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li><a  ><span class="glyphicon glyphicon-user"></span>{{" " + user}}</a></li>
+                    <li>
+                        <a  ><span class="glyphicon glyphicon-user"></span>{{" " + user}}</a>
+                    </li>
                     <li ng-click="logout()">
                         <a  ><span class="glyphicon glyphicon-log-out"></span> LogOut</a>
                     </li>
                 </ul>
             </div>
         </nav>
+
         <!--LOGIN-->
         <div ng-if="user === ''" class="modal-dialog">
             <div class="loginmodal-container">
@@ -45,7 +52,7 @@ and open the template in the editor.
 
                 <hr>
                 <form>
-                    <input type="text" value="e@mail.com" id="user" placeholder="Email">
+                    <input type="text" value="s@mail.com" id="user" placeholder="Email">
                     <input type="password" value="123" id="pass" placeholder="Password">
                     <input type="submit" name="login" ng-click="login()" class="login loginmodal-submit" value="Login">
                 </form>
@@ -70,7 +77,7 @@ and open the template in the editor.
                                                   accept="image/*" app-filereader />
                                     <img alt src="" id="prev" >
                                     <script>
-                                        document.getElementById("Imagen").addEventListener("change", readFile);
+                                                document.getElementById("Imagen").addEventListener("change", readFile);
                                     </script>
                                 </label>
                             </th>
@@ -98,18 +105,20 @@ and open the template in the editor.
                         </tr>
                     </table>
                 </div>
+
+
                 <div class="itemStyle col-sm-3" id="element{{$index}}"
-                    ng-repeat="item in DeviceList| filter : search.$  "
-                    >
+                     ng-repeat="item in DeviceList| filter : search  "
+                     >
+
                     <div ng-click="expand($index)">
                         <p class=" textCenter"><b>{{item.feactures.code + "[" + item.feactures.brand + " " + item.feactures.model + "]"}}</b></p>
                         <img   class="col-sm-12" alt="" src="{{item.src}}">
                         <p class="textCenter"><b>{{item.status}}</b>{{" " + item.name}}</p> 
-                    </div>                       
-                    <button ng-click="free($index)" type="button" style="width: 100%;" ng-if="Permission === 1" class="btn btn-default btn-sm">
-                        Free <span class="glyphicon glyphicon-transfer"></span>  
+                    </div>    
+                    <button ng-if="user==item.name" ng-click="free($index)" type="button" style="width: 100%;" ng-if="Permission === 1" class="btn btn-default btn-sm">
+                        Return <span class="glyphicon glyphicon-transfer"></span>  
                     </button>
-                                        
                     <button ng-click="delete($index)" type="button" style="width: 100%;" ng-if="Permission === 1" class="btn btn-default btn-sm">
                         Delete <span class="glyphicon glyphicon-remove"></span>  
                     </button>
@@ -150,8 +159,8 @@ and open the template in the editor.
                                 <input type="number" id="requestTime" placeholder="Time in hours" class="form-control" >
                                 <br>
                                 <select id="requestPriority" class="form-control">
-                                    <option value="Hihg">High</option>
-                                    <option value="Meduim">Medium</option>
+                                    <option value="High">High</option>
+                                    <option value="Medium">Medium</option>
                                     <option value="Low">Low</option>
                                 </select>
                                 <br>
@@ -163,14 +172,23 @@ and open the template in the editor.
                             <div class=" col-sm-3">
                                 <p class=""><b>Stack</b></p>
 
-                                <table class="table">
-                                    <tr ng-repeat=" value in CurrentItem.stack| priorityOrder : priority" >
+                                <table class="table" ng-repeat=" value in CurrentItem.stack| priorityOrder : priority" >
+                                    <tr >
                                         <th>{{"Name: "+value.name}}</th>
-                                        <th>{{"Time: "+value.time + "h"}}</th>
+                                    </tr>  
+                                    <tr >
+                                        <th>{{"Time: "+value.time + " hours"}}</th>
+                                    </tr>  
+                                    <tr >
                                         <th>{{"priority: "+value.priority}}</th>
-                                        <th ng-if="Permission === 1" ><input class="btn" type="button" ng-click="give(value.id)" value="Add" ></th>
+                                    </tr>  
+                                    <tr >
+                                        <th>{{"resquet date: "+ (value.resquetDate | date:'yyyy-MM-dd HH:mm:ss ') }}</th>
+                                    </tr>  
+                                    <tr ng-if="Permission === 1" >
+                                        <th  ><input class="btn" type="button" ng-click="give(value.id)" value="Add" ></th>
                                     </tr>    
-                                    
+
                                 </table>
                             </div> 
                         </div> 
@@ -181,5 +199,16 @@ and open the template in the editor.
                 </div>
             </div>
         </div>
+
+
+
+
+
+
+
+
+
+
+
     </body>
 </html>

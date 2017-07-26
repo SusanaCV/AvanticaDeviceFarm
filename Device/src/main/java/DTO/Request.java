@@ -10,24 +10,19 @@ package DTO;
  * @author susan
  */
 public class Request {
+
     String name;
     int time;
     int id;
     String priority;
+    String resquetDate;
 
-    public Request(int id,String name, int time, String priority) {
-        this.id = id;
-         this.name = name;
+    public Request(String name, int time, int id, String priority, String resquetDate) {
+        this.name = name;
         this.time = time;
-        this.priority = priority;
-    }
-
-    public int getId() {
-        return id;
-    }
-
-    public void setId(int id) {
         this.id = id;
+        this.priority = priority;
+        this.resquetDate = resquetDate;
     }
 
     public String getName() {
@@ -46,6 +41,14 @@ public class Request {
         this.time = time;
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     public String getPriority() {
         return priority;
     }
@@ -53,6 +56,15 @@ public class Request {
     public void setPriority(String priority) {
         this.priority = priority;
     }
-    
-}
 
+    public String getResquetDate() {
+        return resquetDate;
+    }
+
+    public void setResquetDate(String resquetDate) {
+        this.resquetDate = resquetDate;
+    }
+
+ 
+
+}

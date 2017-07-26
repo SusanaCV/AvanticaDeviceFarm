@@ -60,13 +60,12 @@ public class ConectionDB {
 
    
 
-    public static User login(String Email, String Password) {
+    public static User login(String Email) {
         open();
         User user = null;
         try {
             ResultSet resultSet = statement.executeQuery(
-                    "select * from users where Email ='" + Email + "' and Password ='" + Password + "'");
-            //INSERT INTO users( Name, Usuario_Skype, Email) VALUES ('Jimmy','Jxskype','f@valverde')
+                    "select * from users where Email ='" + Email  + "'");
             while (resultSet.next()) {
                 user = new User(resultSet.getInt("ID_User"), resultSet.getInt("Permission"), resultSet.getString("Name"), resultSet.getString("Usuario_Skype"), resultSet.getString("Email"));
                 System.out.println(resultSet.getString("Name"));
@@ -106,7 +105,12 @@ public class ConectionDB {
                 ResultSet resultSetStack = statement2.executeQuery("call getStack(" + num + ");");
                 stack = new ArrayList();
                 while (resultSetStack.next()) {
-                    stack.add(new Request(resultSetStack.getInt("Id_Asignation"),resultSetStack.getString("Name"), resultSetStack.getInt("Time"), resultSetStack.getString("Priority")));
+                    stack.add(new Request(
+                            resultSetStack.getString("Name"),
+                            resultSetStack.getInt("Time"),
+                            resultSetStack.getInt("Id_Asignation"),
+                            resultSetStack.getString("Priority"),
+                            resultSetStack.getString("RequestDate")));
                 }
 
                 list.add(new Device(resultSet.getInt("Id_Device"), resultSet.getString("Name"), resultSet.getString("Image"), resultSet.getString("Status"),
@@ -132,7 +136,6 @@ public class ConectionDB {
 
     public static boolean Delete(int id) {
         open();
-        System.out.println(id + "dsfsdf");
         try {
             statement.executeUpdate("DELETE FROM devices WHERE id_Device =" + id);
 
@@ -148,7 +151,7 @@ public class ConectionDB {
         open();
         try {
             statement.executeUpdate("INSERT INTO asignation("
-                    + " Id_User, Id_Device, Time, Status, Date, Priority) VALUES "
+                    + " Id_User, Id_Device, Time, Status, RequestDate, Priority) VALUES "
                     + "("+idUser+","+idDevice+","+time+",'"+pending+"','"+date+"','"+priority+"')");
 
         } catch (Exception e) {

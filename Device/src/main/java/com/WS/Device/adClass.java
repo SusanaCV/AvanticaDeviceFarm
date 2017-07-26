@@ -21,18 +21,24 @@ import javax.naming.ldap.LdapContext;
  * @author jarcec-as
  */
 public class adClass {
-
+/*public static void main(String[] args) {
+ADConeection("scorrales-as","ScV1503#");
+}*/
     public adClass() {
     }
         
-    public LdapContext ADConeection(){
+    public static LdapContext ADConeection(String user, String password){
+        
+        //quemado
+       // user="marcos.castro";
+       // password = "123456abC";
         LdapContext ldap = null; // Create a new Ldap object        
         try{
             Hashtable env = new Hashtable();
             env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
             env.put(Context.SECURITY_AUTHENTICATION, "Simple");
-            env.put(Context.SECURITY_PRINCIPAL, "AVANTICA\\marcos.castro");
-            env.put(Context.SECURITY_CREDENTIALS, "123456abC");
+            env.put(Context.SECURITY_PRINCIPAL, "AVANTEK-SC\\"+user);//marcos.castro
+            env.put(Context.SECURITY_CREDENTIALS, password);//123456abC
             env.put(Context.PROVIDER_URL, "ldap://192.168.188.2:389");
             ldap = new InitialLdapContext(env, null);
             System.out.println("Connection Successful.");
@@ -43,13 +49,14 @@ public class adClass {
         return ldap;
     }
     
-    public void getUserBasicAttributes(String username, LdapContext ctx) {
+    public void getUserBasicAttributes(String username,String password, LdapContext ctx) {
         try {
             SearchControls constraints = new SearchControls();
             constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
             String[] attrIDs = { "distinguishedName", "sn", "givenname", "mail", "telephonenumber", "sAMAccountName", "name"};
             constraints.setReturningAttributes(attrIDs);
-            username.replace(" ", "*");
+            username = username.replace(" ", "*");
+            username = username.replace(".", "*");
             
             NamingEnumeration answer = ctx.search("DC=avantek-sc,DC=avantica,DC=avanticatec,DC=net", "(name=*" + username+"*)", constraints);
 
@@ -57,7 +64,7 @@ public class adClass {
                 Attributes attrs = ((SearchResult) answer.next()).getAttributes();
              
                if( attrs.get("mail")!=null){
-               ConectionDB.addUser(attrs.get("name").remove(0).toString(),attrs.get("mail").remove(0).toString(),0,"","12345");    
+               ConectionDB.addUser(attrs.get("name").remove(0).toString(),attrs.get("mail").remove(0).toString(),0,"",password);    
                }
                
             }
@@ -68,8 +75,5 @@ public class adClass {
                
     }  
     
-    public String pool(String param){
-        return param.replace(" ", "*");
-    }
    
 }
