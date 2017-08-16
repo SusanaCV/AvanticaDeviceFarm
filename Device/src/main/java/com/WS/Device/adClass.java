@@ -29,9 +29,6 @@ ADConeection("scorrales-as","ScV1503#");
         
     public static LdapContext ADConeection(String user, String password){
         
-        //quemado
-       // user="marcos.castro";
-       // password = "123456abC";
         LdapContext ldap = null; // Create a new Ldap object        
         try{
             Hashtable env = new Hashtable();
@@ -49,30 +46,32 @@ ADConeection("scorrales-as","ScV1503#");
         return ldap;
     }
     
-    public void getUserBasicAttributes(String username,String password, LdapContext ctx) {
+    public String getUserBasicAttributes(String username,String password, LdapContext ctx) {
         try {
             SearchControls constraints = new SearchControls();
             constraints.setSearchScope(SearchControls.SUBTREE_SCOPE);
             String[] attrIDs = { "distinguishedName", "sn", "givenname", "mail", "telephonenumber", "sAMAccountName", "name"};
             constraints.setReturningAttributes(attrIDs);
             username = username.replace(" ", "*");
-            username = username.replace(".", "*");
-            
-            NamingEnumeration answer = ctx.search("DC=avantek-sc,DC=avantica,DC=avanticatec,DC=net", "(name=*" + username+"*)", constraints);
+            NamingEnumeration answer = ctx.search("DC=avantek-sc,DC=avantica,DC=avanticatec,DC=net", "(sAMAccountName=*" + username+"*)", constraints);
 
             while (answer.hasMoreElements()) {                
                 Attributes attrs = ((SearchResult) answer.next()).getAttributes();
+                System.err.println("----------------");
+                System.out.println("Nombre: " + attrs.get("name"));
+                System.out.println("Email: " + attrs.get("mail"));
+                System.out.println("sAMAccountName: " + attrs.get("sAMAccountName"));
              
                if( attrs.get("mail")!=null){
-               ConectionDB.addUser(attrs.get("name").remove(0).toString(),attrs.get("mail").remove(0).toString(),0,"",password);    
+               ConectionDB.addUser(attrs.get("name").remove(0).toString(),attrs.get("mail").remove(0).toString(),0,"");    
                }
                
+            return attrs.get("mail").remove(0).toString();
             }
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return;
-               
+        return username;
     }  
     
    

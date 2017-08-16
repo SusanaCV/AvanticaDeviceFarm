@@ -6,6 +6,7 @@
 package com.WS.Device;
 
 import Controller.ConectionDB;
+import DTO.Device;
 import DTO.User;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,72 +25,81 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 
-    @CrossOrigin(origins = "*")
+@CrossOrigin(origins = "*")
 public class EndPointController {
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/device", method = RequestMethod.GET)
-    public  @ResponseBody  ResponseEntity<ArrayList>  Device() {
-        ArrayList<Object> list = ConectionDB.getDevicesList();
-       
-         return ResponseEntity.ok(list);
+    public @ResponseBody
+    ResponseEntity<ArrayList> Device() {
+        ArrayList<Device> list = ConectionDB.getDevicesList();
+
+        return ResponseEntity.ok(list);
     }
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/request", method = RequestMethod.POST)
 
-    public  @ResponseBody ResponseEntity<ArrayList> request(
+    public @ResponseBody
+    ResponseEntity<ArrayList> request(
             @RequestParam(value = "idUser", defaultValue = "-1") int idUser,
             @RequestParam(value = "idDevice", defaultValue = "-1") int idDevice,
             @RequestParam(value = "time", defaultValue = "0") int time,
             @RequestParam(value = "priority", defaultValue = "") String priority
     ) {
-        if (idUser==-1 ||idDevice==-1 || time < 1 || priority.equals("")) {
+        if (idUser == -1 || idDevice == -1 || time < 1 || priority.equals("")) {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-       
-         if(!ConectionDB.Asignation(idUser, idDevice,time,new Date().getTime(),"Pending",priority)){
-           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
-       }
+
+        if (!ConectionDB.Asignation(idUser, idDevice, time, new Date().getTime(), "Pending", priority)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        }
         return ResponseEntity.ok(null);
     }
 
-     @CrossOrigin(origins = "*")
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/give", method = RequestMethod.POST)
 
-    public  @ResponseBody ResponseEntity<ArrayList> give(
-            @RequestParam(value = "id", defaultValue = "-1") int id
+    public @ResponseBody
+    ResponseEntity<ArrayList> give(
+            @RequestParam(value = "idDevice", defaultValue = "-1") int idDevice,
+            @RequestParam(value = "idAsignation", defaultValue = "-1") int idAsignation
     ) {
-        if (id==-1 ) {
+        if (idDevice == -1 || idAsignation == -1) {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-       
-         if(!ConectionDB.Give(id)){
-           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
-       }
+
+        if (!ConectionDB.add(idDevice, idAsignation)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        }
         return ResponseEntity.ok(null);
     }
-     @CrossOrigin(origins = "*")
+
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/free", method = RequestMethod.POST)
 
-    public  @ResponseBody ResponseEntity<ArrayList> free(
-            @RequestParam(value = "id", defaultValue = "-1") int id
+    public @ResponseBody
+    ResponseEntity<ArrayList> free(
+            @RequestParam(value = "id", defaultValue = "-1") int id,
+            @RequestParam(value = "idAsignation", defaultValue = "-1") int idAsignation
     ) {
-        if (id==-1 ) {
+        if (id == -1 || idAsignation == -1) {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-       
-         if(!ConectionDB.free(id)){
-           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
-       }
+
+        if (!ConectionDB.free(id, idAsignation)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        }
         return ResponseEntity.ok(null);
     }
+
     @CrossOrigin(origins = "*")
-    @RequestMapping(value = "/login",params = {"username", "password"}, method = RequestMethod.GET)
-    public  @ResponseBody ResponseEntity<Object> login(
+    @RequestMapping(value = "/login", params = {"username", "password"}, method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<Object> login(
             @RequestParam(value = "username", defaultValue = "") String username,
             @RequestParam(value = "password", defaultValue = "") String password
     ) {
@@ -98,22 +108,26 @@ public class EndPointController {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-      //  adClass ad = new adClass();
-      //  ad.getUserBasicAttributes(username,password, ad.ADConeection(username,password));        
-        
-       User response = ConectionDB.login(username);
-       if(response==null){
-         
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
-                    }     
+        String email = "";
+        try {
+            adClass ad = new adClass();
+            email = ad.getUserBasicAttributes(username, password, ad.ADConeection(username, password));
+
+        } catch (Exception e) {
+        }
+
+        User response = ConectionDB.login(email);
+        if (response == null) {
+
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
         return ResponseEntity.ok(response);
     }
-    
-    
-    
+
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/NewDevice", method = RequestMethod.POST)
-    public  @ResponseBody ResponseEntity<Object> NewDevice(
+    public @ResponseBody
+    ResponseEntity<Object> NewDevice(
             @RequestParam(value = "code", defaultValue = "") String code,
             @RequestParam(value = "img", defaultValue = "") String img,
             @RequestParam(value = "brand", defaultValue = "") String brand,
@@ -123,35 +137,35 @@ public class EndPointController {
             @RequestParam(value = "ip", defaultValue = "") String ip,
             @RequestParam(value = "mac", defaultValue = "") String mac
     ) {
-      
-        if (code.equals("") || img.equals("")|| brand.equals("")
-                || model.equals("")|| os.equals("")|| version.equals("")
-                || ip.equals("")|| mac.equals("")) {
+
+        if (code.equals("") || img.equals("") || brand.equals("")
+                || model.equals("") || os.equals("") || version.equals("")
+                || ip.equals("") || mac.equals("")) {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-      
-       if(!ConectionDB.NewDevice(code, img,brand,model,os,version,ip,mac)){
-           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
-       }
+
+        if (!ConectionDB.NewDevice(code, img, brand, model, os, version, ip, mac)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        }
         return ResponseEntity.ok("");
     }
-    
-    
-       @CrossOrigin(origins = "*")
+
+    @CrossOrigin(origins = "*")
     @RequestMapping(value = "/delete", method = RequestMethod.POST)
-    public  @ResponseBody ResponseEntity<Object> delete(
+    public @ResponseBody
+    ResponseEntity<Object> delete(
             @RequestParam(value = "id", defaultValue = "-1") int id
     ) {
-           System.out.println(1);
-        if (id==-1) {
+        System.out.println(1);
+        if (id == -1) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
         System.out.println(2);
-       if(!ConectionDB.Delete(id)){
-           return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
-       }
-       System.out.println(3);
+        if (!ConectionDB.Delete(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        }
+        System.out.println(3);
         return ResponseEntity.ok("");
     }
 }

@@ -5,6 +5,7 @@
  */
 package DTO;
 
+import Controller.ConectionDB;
 import java.util.Date;
 
 /**
@@ -13,57 +14,40 @@ import java.util.Date;
  */
 public class AsignationStack {
 
-    private int remainTime;
-    private int hours;
-    private long startTime;
-    private User user;
-    private boolean status;
+   
+    private Asignation asignation;
     private String lastUserName;
     private boolean send = false;
-    private int asignationdID;
-    private int deviceID;
 
-    public AsignationStack(int deviceID, int asignationdID, int hours, long startTime, User user, boolean status, String lastUserName) {
-
-        this.asignationdID = asignationdID;
-        this.deviceID = deviceID;
-        this.remainTime = 999;
-        this.hours = hours;
-        this.startTime = startTime;
-        this.user = user;
-        this.status = status;
-        this.lastUserName = lastUserName;
+    public AsignationStack( Asignation asignation) {
+       
+      
+        this.asignation = asignation;
+        this.lastUserName = "";
     }
 
-    public void updateTime() {
-        this.remainTime = ((hours * 1000) - (int) (new Date().getTime() - this.startTime)) / 1000;
-    }
-
+   
     public int getTime() {
-        return this.remainTime;
+        return ((this.asignation.getTime() * 3600000) - (int) (new Date().getTime() -Long.parseLong(this.asignation.getStartDate(), 10) )) / 1000;
     }
 
-    public User getCurrentUser() {
-        return this.user;
-    }
-
-    public boolean getStatus() {
-        return this.status;
-    }
+  
 
     public String getLastUserName() {
         return this.lastUserName;
     }
 
     public void next() {
-        this.lastUserName = this.user.getName();
-        this.user = new User(2, 0, "ss", "skype", "ss@");
+        this.lastUserName = this.asignation.getName();
+        //load
         this.send = false;
-        //conxion save end time
-        // accepted by user
-        this.status = true;
-        this.remainTime = 5;
-        this.startTime = new Date().getTime();
+        
+        this.asignation=ConectionDB.nextAsignation(asignation.getIdDevice());
+        if(this.asignation==null){
+            return;
+        }
+        ConectionDB.Take(this.asignation.id, this.asignation.idDevice);      
+     
     }
 
     public boolean isSend() {
@@ -74,4 +58,17 @@ public class AsignationStack {
         this.send = send;
     }
 
+    public Asignation getAsignation() {
+        return asignation;
+    }
+
+    public void setAsignation(Asignation asignation) {
+        this.asignation = asignation;
+    }
+
+   
+
+   
+   
+    
 }

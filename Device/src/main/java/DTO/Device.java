@@ -14,15 +14,15 @@ import java.util.ArrayList;
 public class Device {
 
     int ID;
-    String Name;
+    int AsignationID;
     String Src;
     String Status;
     Feactures feactures;
-    ArrayList<Request> stack;
+    ArrayList<Asignation> stack;
 
-    public Device(int ID, String Name,String Src, String Status, Feactures feactures, ArrayList<Request> stack) {
+    public Device(int ID, int AsignationID,String Src, String Status, Feactures feactures, ArrayList<Asignation> stack) {
         this.ID = ID;
-        this.Name = Name;
+        this.AsignationID = AsignationID;
         this.Src = Src;
         this.Status = Status;
         this.feactures = feactures;
@@ -43,15 +43,7 @@ public class Device {
 
     public void setID(int ID) {
         this.ID = ID;
-    }
-
-    public String getName() {
-        return Name;
-    }
-
-    public void setName(String Name) {
-        this.Name = Name;
-    }
+    }  
 
     public String getStatus() {
         return Status;
@@ -69,12 +61,20 @@ public class Device {
         this.feactures = feactures;
     }
 
-    public ArrayList<Request> getStack() {
+    public ArrayList<Asignation> getStack() {
         return stack;
     }
 
-    public void setStack(ArrayList<Request> stack) {
+    public void setStack(ArrayList<Asignation> stack) {
         this.stack = stack;
+    }
+
+    public int getAsignationID() {
+        return AsignationID;
+    }
+
+    public void setAsignationID(int AsignationID) {
+        this.AsignationID = AsignationID;
     }
 
 

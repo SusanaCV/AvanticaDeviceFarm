@@ -1,5 +1,6 @@
 package com.WS.Device;
 
+import Controller.AsignationHandler;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -7,10 +8,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DeviceApplication {
 
 	public static void main(String[] args) {
-            adClass ad = new adClass();
-        
-
-       
-		SpringApplication.run(DeviceApplication.class, args);
+          AsignationHandler.startAsignationHandler();
+          SpringApplication.run(DeviceApplication.class, args);
 	}
 }

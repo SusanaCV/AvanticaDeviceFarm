@@ -7,7 +7,7 @@ package Controller;
 
 import DTO.Device;
 import DTO.Feactures;
-import DTO.Request;
+import DTO.Asignation;
 import DTO.User;
 import com.WS.Device.DeviceApplication;
 import java.sql.Connection;
@@ -58,14 +58,12 @@ public class ConectionDB {
         }
     }
 
-   
-
     public static User login(String Email) {
         open();
         User user = null;
         try {
             ResultSet resultSet = statement.executeQuery(
-                    "select * from users where Email ='" + Email  + "'");
+                    "select * from users where Email ='" + Email + "'");
             while (resultSet.next()) {
                 user = new User(resultSet.getInt("ID_User"), resultSet.getInt("Permission"), resultSet.getString("Name"), resultSet.getString("Usuario_Skype"), resultSet.getString("Email"));
                 System.out.println(resultSet.getString("Name"));
@@ -90,30 +88,34 @@ public class ConectionDB {
         return true;
     }
 
-    public static ArrayList<Object> getDevicesList() {
-
-        open();
-        ArrayList<Object> list = new ArrayList();
-        ArrayList<Request> stack;
+    public static ArrayList<Device> getDevicesList() {
+        open();//Conexion con base de datos
+        ArrayList<Device> list = new ArrayList();
+        ArrayList<Asignation> stack;
         try {
             ResultSet resultSet = statement.executeQuery(
                     "select * from devices");
-          
+            // Cargar informacion de device
             while (resultSet.next()) {
                 int num = resultSet.getInt("Id_Device");
-                Statement statement2  = connect.createStatement();
+                Statement statement2 = connect.createStatement();
                 ResultSet resultSetStack = statement2.executeQuery("call getStack(" + num + ");");
                 stack = new ArrayList();
                 while (resultSetStack.next()) {
-                    stack.add(new Request(
-                            resultSetStack.getString("Name"),
-                            resultSetStack.getInt("Time"),
+                    stack.add(new Asignation(
                             resultSetStack.getInt("Id_Asignation"),
+                            resultSetStack.getInt("Id_User"),
+                            resultSetStack.getInt("Id_Device"),
+                            resultSetStack.getString("Status"),
+                            resultSetStack.getString("Name"),
+                            resultSetStack.getString("Email"),
+                            resultSetStack.getInt("Time"),
                             resultSetStack.getString("Priority"),
-                            resultSetStack.getString("RequestDate")));
+                            resultSetStack.getString("RequestDate"),
+                            resultSetStack.getString("StartDate"),
+                            resultSetStack.getString("EndDate")));
                 }
-
-                list.add(new Device(resultSet.getInt("Id_Device"), resultSet.getString("Name"), resultSet.getString("Image"), resultSet.getString("Status"),
+                list.add(new Device(resultSet.getInt("Id_Device"), resultSet.getInt("AsignationID"), resultSet.getString("Image"), resultSet.getString("Status"),
                         new Feactures(resultSet.getString(
                                 "OperativeSystem"),
                                 resultSet.getString("Brand"),
@@ -124,8 +126,7 @@ public class ConectionDB {
                                 resultSet.getString("IP")),
                         stack));
             }
-        } catch (Exception e) 
-        {
+        } catch (Exception e) {
             e.printStackTrace();
 
         }
@@ -138,7 +139,6 @@ public class ConectionDB {
         open();
         try {
             statement.executeUpdate("DELETE FROM devices WHERE id_Device =" + id);
-
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -152,7 +152,7 @@ public class ConectionDB {
         try {
             statement.executeUpdate("INSERT INTO asignation("
                     + " Id_User, Id_Device, Time, Status, RequestDate, Priority) VALUES "
-                    + "("+idUser+","+idDevice+","+time+",'"+pending+"','"+date+"','"+priority+"')");
+                    + "(" + idUser + "," + idDevice + "," + time + ",'" + pending + "','" + date + "','" + priority + "')");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -162,18 +162,12 @@ public class ConectionDB {
         return true;
     }
 
-    public static boolean Give(int id) {
-     open();
+    public static boolean add(int idDevice, int idAsignation) {
+        open();
         try {
-            statement.executeUpdate("Update asignation set Status='Given' where Id_Asignation="+id);
-            Statement statement2  = connect.createStatement();
-             ResultSet result= statement2.executeQuery(
-                     "SELECT Id_Device,Name from asignation as a,users as u "
-                             + "where a.Id_User=u.Id_User and a.Id_Asignation="+id);
-           result.next();
-             Statement statement3  = connect.createStatement();
-             statement3.executeUpdate("Update Devices set Status='In use', Name='"+result.getString("Name")+
-                     "' where Id_Device="+result.getInt("Id_Device"));
+            statement.executeUpdate("Update asignation set Status='Given',StartDate ='" + new Date().getTime() + "' where Id_Asignation=" + idAsignation);
+            Statement statement2 = connect.createStatement();
+            statement2.executeUpdate("Update Devices set Status='In use' where Id_Device=" + idDevice);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -182,10 +176,12 @@ public class ConectionDB {
         return true;
     }
 
-    public static boolean free(int id) {
-         open();
+    public static boolean Take(int idAsignation, int idDevice) {
+        open();
         try {
-            statement.executeUpdate("Update Devices set Status='Available', Name='' where Id_Device="+id);
+            statement.executeUpdate("Update asignation set Status='Take' where Id_Asignation=" + idAsignation);
+            Statement statement2 = connect.createStatement();
+            statement2.executeUpdate("Update Devices set AsignationID=" + idAsignation + " where Id_Device=" + idDevice);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -194,16 +190,72 @@ public class ConectionDB {
         return true;
     }
 
-    public static void addUser(String name, String email, int permission, String skype, String password) {
+    public static boolean free(int idDevice, int idAsignation) {
+        open();
+        try {
+            statement.executeUpdate("Update Devices set Status='Available', AsignationID=-1 where Id_Device=" + idDevice);
+
+            Statement statement2 = connect.createStatement();
+            statement2.executeUpdate("Update asignation set Status='Completed' , EndDate ='"+new Date().getTime()+"' where Id_Asignation=" + idAsignation);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        close();
+        return true;
+    }
+
+    public static void addUser(String name, String email, int permission, String skype) {
         open();
         try {
             statement.executeUpdate(
                     "INSERT INTO users( Permission, Name, Usuario_Skype, Email, Password) "
-                            + "VALUES ("+permission+",'"+name+"','"+skype+"','"+email+"','"+password+"')");
+                    + "VALUES (" + permission + ",'" + name + "','" + skype + "','" + email + "')");
         } catch (Exception e) {
-            
-            
+
         }
         close();
+    }
+
+    public static Asignation nextAsignation(int idDevice) {
+        open();
+        try {
+            ArrayList<Asignation> stack;
+
+            ResultSet resultSetStack = statement.executeQuery("call getStack(" + idDevice + ");");
+            stack = new ArrayList();
+            while (resultSetStack.next()) {
+                stack.add(new Asignation(
+                        resultSetStack.getInt("Id_Asignation"),
+                        resultSetStack.getInt("Id_User"),
+                        resultSetStack.getInt("Id_Device"),
+                        resultSetStack.getString("Status"),
+                        resultSetStack.getString("Name"),
+                        resultSetStack.getString("Email"),
+                        resultSetStack.getInt("Time"),
+                        resultSetStack.getString("Priority"),
+                        resultSetStack.getString("RequestDate"),
+                        resultSetStack.getString("StartDate"),
+                        resultSetStack.getString("EndDate")));
+            }
+           
+            close();
+            
+             Asignation asignation=stack.get(0);//toma la primera asignation
+             for (Asignation stackAsignation : stack) {// recorre toda la lista de asignations
+                if(stackAsignation.getPriority().equals("High")){//devuelve el primer elmento con priority Hing
+                    return stackAsignation;
+                }
+                if(asignation.getPriority().equals("Low")&&stackAsignation.getPriority().equals("Medium")){
+//si la primera asignation fue low y existe una medium la cambia por la primera Medium
+                    asignation=stackAsignation;
+                }
+            }
+            return asignation;
+        } catch (Exception e) {
+            close();
+            return null;
+
+        }
     }
 }

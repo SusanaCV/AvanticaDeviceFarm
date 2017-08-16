@@ -72,10 +72,10 @@
     padding: 2px 16px;
 min-height:  300px;   
 }
-.BG_Blue{    
-    background-color: #5c5cb8;
+.BG_In_Use{    
+    background-color: #b85c5c;
 }
-.BG_Green{    
+.BG_Available{    
     background-color: #5cb85c;
 }
 .modal-footer {

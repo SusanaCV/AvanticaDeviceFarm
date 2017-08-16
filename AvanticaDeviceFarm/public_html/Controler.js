@@ -1,11 +1,12 @@
 var app = angular.module("myApp", []);
 app.controller("myCtrl", function ($scope, $window, $http) {
-    $scope.CurrentItem = "";
+    $scope.CurrentDevice = "";
     $scope.totalTime = 0;
     $scope.user = "";
     $scope.id = 0;
+    $scope.currentView=0;
     $scope.DeviceList = [];
-     $scope.print= function () {
+    $scope.print= function () {
         
   console.log($scope.asd);
     };
@@ -49,7 +50,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             type: 'POST',
             data: {
                 idUser: $scope.id,
-                idDevice: $scope.CurrentItem.id,
+                idDevice: $scope.CurrentDevice.id,
                 time: document.getElementById("requestTime").value,
                 priority: document.getElementById("requestPriority").value
             },
@@ -67,9 +68,9 @@ app.controller("myCtrl", function ($scope, $window, $http) {
 
     //Expandir Modal y cargar los datos
     $scope.expand = function (index) {
-        $scope.CurrentItem = $scope.DeviceList[index];
+        $scope.CurrentDevice = $scope.DeviceList[index];
         $scope.totalTime = 0;
-        angular.forEach($scope.CurrentItem.stack, function (item) {
+        angular.forEach($scope.CurrentDevice.stack, function (item) {
             $scope.totalTime = $scope.totalTime + item.time;
         });
 
@@ -85,9 +86,9 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     $scope.whatClassIsIt = function (someValue) {
 
         if (someValue === "In use")
-            return "BG_Green";
+            return "BG_In_Use";
         else
-            return "BG_Blue";
+            return "BG_Available";
 
     };
 //Verificar el estado
@@ -122,19 +123,25 @@ app.controller("myCtrl", function ($scope, $window, $http) {
         });
     };
     //Devolver el dispositivo
-    $scope.free = function (index) {
-
+    $scope.free = function (currentDevice) {
+console.log(currentDevice);
         $.ajax({url: 'http://localhost:8080/free',
             type: 'POST',
-            data: {id: $scope.DeviceList[index].id},
+            data: {id: currentDevice.id,
+            idAsignation: currentDevice.asignationID
+            },
             success: function (result) {
-                $scope.load();
+                $scope.load();   
+                $scope.close();
             },
             error: function (result) {
                 alert("delete fail");
             }
         });
     };
+     $scope.setView = function (val) {
+         $scope.currentView=val;
+     }
     //Agregar nuevo deispositivo 
     $scope.NewDevice = function () {
 
@@ -167,11 +174,12 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     };
 
     //Asignacion de dispositivo
-    $scope.give = function (id) {
+    $scope.give = function (idDevice,idAsignation) {
         $.ajax({url: 'http://localhost:8080/give',
             type: 'POST',
             data: {
-                id: id
+                idDevice: idDevice,
+                idAsignation:idAsignation
             },
             success: function (result) {
                 alert("Request Succesfull");
