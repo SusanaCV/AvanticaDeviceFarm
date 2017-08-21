@@ -71,7 +71,7 @@ ADConeection("scorrales-as","ScV1503#");
         } catch (Exception ex) {
             ex.printStackTrace();
         }
-        return username;
+        return "";
     }  
     
    

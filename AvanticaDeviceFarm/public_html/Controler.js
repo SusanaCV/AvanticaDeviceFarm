@@ -23,7 +23,6 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                     console.log(result);
                     $scope.DeviceList = result;
                     $scope.informs();
-                    $scope.$apply();
             },
             error: function (result) {
                 alert("Devices not found");
@@ -56,6 +55,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 $scope.id = result.id;
                 $scope.Permission = result.permision;
                 $scope.load();
+                $scope.apply();
             },
             error: function (result) {
                 alert("Data not found");
@@ -160,7 +160,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
          error: function (result) {
          alert("delete fail");
          }
-         });*/
+         });*/ 
         $('#container').highcharts({
             title: {
                 text: 'Device Usage',

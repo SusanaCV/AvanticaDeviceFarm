@@ -120,10 +120,11 @@ public class EndPointController {
         String email = "";
         try {
             adClass ad = new adClass();
-            email =ad.getUserBasicAttributes(username, password, ad.ADConeection(username, password));
+            // email =ad.getUserBasicAttributes(username, password, ad.ADConeection(username, password));
 
+           email =username;
         } catch (Exception e) {
-        }
+         }
 
         User response = ConectionDB.login(email);
         if (response == null) {
