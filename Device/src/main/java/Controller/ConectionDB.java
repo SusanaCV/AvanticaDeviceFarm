@@ -8,6 +8,8 @@ package Controller;
 import DTO.Device;
 import DTO.Feactures;
 import DTO.Asignation;
+import DTO.Inform;
+import DTO.Informs;
 import DTO.User;
 import com.WS.Device.DeviceApplication;
 import java.sql.Connection;
@@ -147,12 +149,12 @@ public class ConectionDB {
         return true;
     }
 
-    public static boolean Asignation(int idUser, int idDevice, int time, long date, String pending, String priority) {
+    public static boolean Asignation(int idUser, int idDevice, int time, long date, String pending, String priority, int month, int year) {
         open();
         try {
             statement.executeUpdate("INSERT INTO asignation("
-                    + " Id_User, Id_Device, Time, Status, RequestDate, Priority) VALUES "
-                    + "(" + idUser + "," + idDevice + "," + time + ",'" + pending + "','" + date + "','" + priority + "')");
+                    + " Id_User, Id_Device, Time, Status, RequestDate, Priority,Month,Year) VALUES "
+                    + "(" + idUser + "," + idDevice + "," + time + ",'" + pending + "','" + date + "','" + priority + "'," + month + "," + year + ")");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -196,7 +198,7 @@ public class ConectionDB {
             statement.executeUpdate("Update Devices set Status='Available', AsignationID=-1 where Id_Device=" + idDevice);
 
             Statement statement2 = connect.createStatement();
-            statement2.executeUpdate("Update asignation set Status='Completed' , EndDate ='"+new Date().getTime()+"' where Id_Asignation=" + idAsignation);
+            statement2.executeUpdate("Update asignation set Status='Completed' , EndDate ='" + new Date().getTime() + "' where Id_Asignation=" + idAsignation);
         } catch (Exception e) {
             e.printStackTrace();
             return false;
@@ -238,17 +240,17 @@ public class ConectionDB {
                         resultSetStack.getString("StartDate"),
                         resultSetStack.getString("EndDate")));
             }
-           
+
             close();
-            
-             Asignation asignation=stack.get(0);//toma la primera asignation
-             for (Asignation stackAsignation : stack) {// recorre toda la lista de asignations
-                if(stackAsignation.getPriority().equals("High")){//devuelve el primer elmento con priority Hing
+
+            Asignation asignation = stack.get(0);//toma la primera asignation
+            for (Asignation stackAsignation : stack) {// recorre toda la lista de asignations
+                if (stackAsignation.getPriority().equals("High")) {//devuelve el primer elmento con priority Hing
                     return stackAsignation;
                 }
-                if(asignation.getPriority().equals("Low")&&stackAsignation.getPriority().equals("Medium")){
+                if (asignation.getPriority().equals("Low") && stackAsignation.getPriority().equals("Medium")) {
 //si la primera asignation fue low y existe una medium la cambia por la primera Medium
-                    asignation=stackAsignation;
+                    asignation = stackAsignation;
                 }
             }
             return asignation;
@@ -257,5 +259,62 @@ public class ConectionDB {
             return null;
 
         }
+    }
+
+    public static boolean UpdateDevice(int id, String code, String img, String brand, String model, String os, String version, String ip, String mac) {
+        open();
+        try {
+            statement.executeUpdate("UPDATE devices set OperativeSystem='" + os + "',"
+                    + " Brand='" + brand + "',"
+                    + " Model='" + model + "',"
+                    + " Code='" + code + "',"
+                    + " Version='" + model + "',"
+                    + " MAC_Address='" + mac + "',"
+                    + " IP='" + ip + "',"
+                    + " Image='" + img + " 'where Id_Device=" + id);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+        close();
+        return true;
+    }
+
+    public static ArrayList<Informs> getInformList() {
+        open();//Conexion con base de datos
+        ArrayList<Informs> list = new ArrayList();
+        int id;
+        try {
+            ResultSet resultSet = statement.executeQuery(
+                    "SELECT year FROM informs GROUP BY Year");
+            // Cargar informacion de device
+            while (resultSet.next()) {
+                Informs NI = new Informs(resultSet.getInt("year"), null);
+                Statement statement2 = connect.createStatement();
+                ResultSet resultSetStack = statement2.executeQuery(
+                        "SELECT d.Brand,d.model,i.Id_Device FROM informs as i,devices as d WHERE i.year=" + NI.getYear() + " and i.id_device=d.Id_Device GROUP by Id_Device");
+
+                ArrayList<Inform> series = new ArrayList();
+                while (resultSetStack.next()) {
+                    id=resultSetStack.getInt("Id_Device");
+                    Inform NNI = new Inform(resultSetStack.getString("Brand") + " " + resultSetStack.getString("model"));
+                    Statement statement3 = connect.createStatement();
+                    ResultSet resultSet3 = statement3.executeQuery("SELECT Month, Count FROM informs WHERE year="+NI.getYear() +" and id_device="+id);
+                    while (resultSet3.next()) {
+                        NNI.getData().set(resultSet3.getInt("Month"), resultSet3.getInt("Count"));
+                    }
+                    series.add(NNI);
+                }
+                NI.setSeries(series);
+                list.add(NI);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+
+        }
+        close();
+
+        return list;
     }
 }

@@ -50,7 +50,6 @@
             <classifier>features</classifier>
         </dependency>
     </dependencies>
-
     <build>
         <plugins>
             <plugin>

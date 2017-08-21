@@ -7,28 +7,32 @@ and open the template in the editor.
 <html>
     <head>
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-
+        <script src="highcharts.js"></script>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.4/angular.min.js"></script>
         <script src="Controler.js"></script>
         <link rel="stylesheet" href="Styles.css">
         <link rel="stylesheet" href="ModalStyles.css">
         <link rel="stylesheet" href="LoginStyle.css">
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
         <title>TODO supply a title</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body  ng-app="myApp" ng-controller="myCtrl">
+        <!--nav bar-->
         <nav ng-if="user !== ''" class="navbar navbar-inverse">
             <div class="container-fluid">
                 <div class="navbar-header">
-                    <a class="navbar-brand" ng-click=" setView(0) ; load();">Device Farm</a>
+                    <a class="navbar-brand" ng-click=" setView(0); load();">Device Farm</a>
                 </div>
                 <ul class="nav navbar-nav">
-                    <li  ng-if="Permission === 1" ng-click=" setView(1) ">
+                    <li  ng-if="Permission === 1" ng-click=" setView(1)">
                         <a  ><span class="glyphicon glyphicon-device"></span>Add Device</a>
+                    </li>  
+                    <li  ng-if="Permission === 1" ng-click=" setView(4)">
+                        <a  ><span class="glyphicon glyphicon-device"></span>Informs</a>
                     </li>  
                     <li style="top:7px;">
                         <input ng-model="$parent.search" type="text" class="form-control"  placeholder="Search">
@@ -44,7 +48,16 @@ and open the template in the editor.
                 </ul>
             </div>
         </nav>
-
+        <!--Graphics-->
+        <div class="row" ng-if="currentView === 4">
+            <div class="itemStyle col-sm-12" ng-if="Permission === 1">
+            <h3>Select Year</h3>
+                <select class="form-control" ng-options="inform.year  for inform in InformsList" 
+                        ng-model="item" ng-change="DATA(item)">
+                </select>
+                <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+            </div>
+        </div>
         <!--LOGIN-->
         <div ng-if="user === ''" class="modal-dialog">
             <div class="loginmodal-container">
@@ -61,7 +74,9 @@ and open the template in the editor.
         </div>
         <!--HOME-->
         <div ng-if="user !== ''" class="container">
-             <div class="row" ng-if="currentView === 1">
+
+            <!-- Add Device -->
+            <div class="row" ng-if="currentView === 1">
                 <div class="itemStyle col-sm-12" ng-if="Permission === 1">
                     <p>New Device</p>
                     <table class="table">
@@ -74,7 +89,7 @@ and open the template in the editor.
                                 <label class="btn btn-default btn-file">
                                     Browse <input id="Imagen" type="file" style="display: none;" ng-model="editItem._attachments_uri.image" 
                                                   accept="image/*" app-filereader />
-                                    <img alt src="" id="prev" >
+                                    <img alt style="width: auto;max-height: 200px; " src="" id="prev" >
                                     <script>
                                                 document.getElementById("Imagen").addEventListener("change", readFile);
                                     </script>
@@ -105,6 +120,53 @@ and open the template in the editor.
                     </table>
                 </div>
             </div>
+
+            <!-- Update Device -->
+            <div class="row" ng-if="currentView === 3">
+                <div class="itemStyle col-sm-12" ng-if="Permission === 1">
+                    <h1>Update Device</h1>
+                    <table class="table">
+                        <tr>
+                            <th>Code:</th><th><input  ng-model="CurrentDevice.feactures.code" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>Image:</th>
+                            <th>
+                                <label class="btn btn-default btn-file">
+                                    Browse <input id="ImagenUpdate" type="file" style="display: none;" ng-model="editItem._attachments_uri.image" 
+                                                  accept="image/*" app-filereader />
+                                    <img style="width: auto;max-height: 200px; " alt id="prevUpdate" src="{{CurrentDevice.src}}"   >
+                                    <script>
+                                                document.getElementById("ImagenUpdate").addEventListener("change", readFileUpdate);
+                                    </script>
+                                </label>
+                            </th>
+                        </tr>
+                        <tr>
+                            <th>Brand:</th><th><input ng-model="CurrentDevice.feactures.brand" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>Model:</th><th><input  ng-model="CurrentDevice.feactures.model" type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>OS:</th><th><input ng-model="CurrentDevice.feactures.os"  type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>Version:</th><th><input ng-model="CurrentDevice.feactures.version"  type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>IP:</th><th><input ng-model="CurrentDevice.feactures.ip"  type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th>MAC Adress:</th><th><input ng-model="CurrentDevice.feactures.mac"  type="text"   ></th>
+                        </tr>
+                        <tr>
+                            <th></th><th><input type="button" ng-click="updateDevice()" class="btn btn-primary" value="Update"></th>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+            <!-- Device Farm-->
             <div class="row" ng-if="currentView === 0" >
 
 
@@ -116,7 +178,10 @@ and open the template in the editor.
                         <p class=" textCenter"><b>{{item.feactures.code + "[" + item.feactures.brand + " " + item.feactures.model + "]"}}</b></p>
                         <img   class="col-sm-12" alt="" src="{{item.src}}">
                         <p class="textCenter"><b>{{item.status}}</b>{{" " + item.name}}</p> 
-                    </div>    
+                    </div>     
+                    <button ng-click="update($index)" type="button" style="width: 100%;" ng-if="Permission === 1" class="btn btn-default btn-sm">
+                        Update <span class="glyphicon glyphicon-sort"></span>  
+                    </button>
                     <button ng-click="delete($index)" type="button" style="width: 100%;" ng-if="Permission === 1" class="btn btn-default btn-sm">
                         Delete <span class="glyphicon glyphicon-remove"></span>  
                     </button>
@@ -183,17 +248,17 @@ and open the template in the editor.
                                     <tr >
                                         <th>{{"resquet date: "+ (stack.resquetDate | date:'yyyy-MM-dd HH:mm:ss ') }}</th>
                                     </tr>  
-                                    <tr ng-if="stack.name ===user&&stack.status ==='Take'&&stack.id===CurrentDevice.asignationID" >
-                                        <th  ><input class="btn" type="button" ng-click="give(CurrentDevice.id,stack.id)" value="Add" ></th>
+                                    <tr ng-if="stack.name === user && stack.status === 'Take' && stack.id === CurrentDevice.asignationID" >
+                                        <th  ><input class="btn" type="button" ng-click="give(CurrentDevice.id, stack.id)" value="Add" ></th>
                                     </tr>    
-                                    <tr ng-if="stack.name ===user&&stack.status ==='Given'&&stack.id===CurrentDevice.asignationID" >
+                                    <tr ng-if="stack.name === user && stack.status === 'Given' && stack.id === CurrentDevice.asignationID" >
                                         <th  >
                                             <button  ng-click="free(CurrentDevice)" type="button" style="width: 100%;" class="btn btn-default btn-sm">
                                                 Return <span class="glyphicon glyphicon-transfer"></span>  
                                             </button>
                                         </th>
                                     </tr>
-                                    
+
                                 </table>
                             </div> 
                         </div> 

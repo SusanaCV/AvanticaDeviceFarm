@@ -7,8 +7,10 @@ package com.WS.Device;
 
 import Controller.ConectionDB;
 import DTO.Device;
+import DTO.Informs;
 import DTO.User;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,6 +38,14 @@ public class EndPointController {
 
         return ResponseEntity.ok(list);
     }
+     @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/informs", method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<ArrayList> inform() {
+        ArrayList<Informs> list = ConectionDB.getInformList();
+
+        return ResponseEntity.ok(list);
+    }
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/request", method = RequestMethod.POST)
@@ -51,8 +61,7 @@ public class EndPointController {
 
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
         }
-
-        if (!ConectionDB.Asignation(idUser, idDevice, time, new Date().getTime(), "Pending", priority)) {
+        if (!ConectionDB.Asignation(idUser, idDevice, time, new Date().getTime(), "Pending", priority, Calendar.getInstance().get(Calendar.MONTH)+1, Calendar.getInstance().get(Calendar.YEAR))) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
         return ResponseEntity.ok(null);
@@ -111,7 +120,7 @@ public class EndPointController {
         String email = "";
         try {
             adClass ad = new adClass();
-            email = ad.getUserBasicAttributes(username, password, ad.ADConeection(username, password));
+            email =ad.getUserBasicAttributes(username, password, ad.ADConeection(username, password));
 
         } catch (Exception e) {
         }
@@ -146,6 +155,33 @@ public class EndPointController {
         }
 
         if (!ConectionDB.NewDevice(code, img, brand, model, os, version, ip, mac)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        }
+        return ResponseEntity.ok("");
+    }
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/updateDevice", method = RequestMethod.POST)
+    public @ResponseBody
+    ResponseEntity<Object> updateDevice(
+            @RequestParam(value = "id", defaultValue = "-1") int id,
+            @RequestParam(value = "code", defaultValue = "") String code,
+            @RequestParam(value = "img", defaultValue = "") String img,
+            @RequestParam(value = "brand", defaultValue = "") String brand,
+            @RequestParam(value = "model", defaultValue = "") String model,
+            @RequestParam(value = "os", defaultValue = "") String os,
+            @RequestParam(value = "version", defaultValue = "") String version,
+            @RequestParam(value = "ip", defaultValue = "") String ip,
+            @RequestParam(value = "mac", defaultValue = "") String mac
+    ) {
+
+        if (id==-1 || code.equals("") || img.equals("") || brand.equals("")
+                || model.equals("") || os.equals("") || version.equals("")
+                || ip.equals("") || mac.equals("")) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+
+        if (!ConectionDB.UpdateDevice(id,code, img, brand, model, os, version, ip, mac)) {
             return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
         }
         return ResponseEntity.ok("");

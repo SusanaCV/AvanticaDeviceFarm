@@ -4,21 +4,47 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     $scope.totalTime = 0;
     $scope.user = "";
     $scope.id = 0;
-    $scope.currentView=0;
+    $scope.yearIndex = 0;
+    $scope.currentView = 0;
     $scope.DeviceList = [];
-    $scope.print= function () {
-        
-  console.log($scope.asd);
+    $scope.InformsList = [];
+
+
+
+    $scope.print = function () {
+
+        console.log($scope.asd);
     };
     //Endpoint de dispositivos
     $scope.load = function () {
-        $http.get('http://localhost:8080/device').
-                then(function (response) {
-                    console.log(response.data);
-                    $scope.DeviceList = response.data;
-                });
+          $.ajax({url: 'http://localhost:8080/device',
+            type: 'GET',
+            success: function (result) {
+                    console.log(result);
+                    $scope.DeviceList = result;
+                    $scope.informs();
+                    $scope.$apply();
+            },
+            error: function (result) {
+                alert("Devices not found");
+            }
+        });
     };
-    
+
+    //Endpoint de dispositivos
+    $scope.informs = function () {
+         $.ajax({url: 'http://localhost:8080/informs',
+            type: 'GET',
+            success: function (result) {
+                    console.log(result);
+                    $scope.InformsList = result;
+            },
+            error: function (result) {
+                alert("Informs not found");
+            }
+        });
+    };
+
     //Endpoint Login
     $scope.login = function () {
         $.ajax({url: 'http://localhost:8080/login',
@@ -30,7 +56,6 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 $scope.id = result.id;
                 $scope.Permission = result.permision;
                 $scope.load();
-                $scope.$apply();
             },
             error: function (result) {
                 alert("Data not found");
@@ -41,8 +66,9 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     //Cerra Sesion
     $scope.logout = function () {
         $scope.user = "";
+        $scope.currentView = -1;
     };
-    
+
     //Endpoint de solicitud de dispositivos 
     $scope.AsigMe = function () {
 
@@ -122,16 +148,70 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             }
         });
     };
+    $scope.DATA = function (index) {
+        $scope.yearIndex = $scope.InformsList.indexOf(index);
+
+        /*  $.ajax({url: 'http://localhost:8080/delete',
+         type: 'POST',
+         data: {id: $scope.DeviceList[index].id},
+         success: function (result) {
+         $scope.load();
+         },
+         error: function (result) {
+         alert("delete fail");
+         }
+         });*/
+        $('#container').highcharts({
+            title: {
+                text: 'Device Usage',
+                x: -20 //center
+            },
+            subtitle: {
+                text: $scope.InformsList[$scope.yearIndex].year,
+                x: -20
+            },
+            xAxis: {
+                categories: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+            },
+            yAxis: {
+                title: {
+                    text: 'Uses per month'
+                },
+                plotLines: [{
+                        value: 0,
+                        width: 1,
+                        color: '#808080'
+                    }]
+            },
+            tooltip: {
+                valueSuffix: 'Times'
+            },
+            legend: {
+                layout: 'vertical',
+                align: 'right',
+                verticalAlign: 'middle',
+                borderWidth: 0
+            },
+            series: $scope.InformsList[$scope.yearIndex].series
+        });
+    };
+    //go to update
+    $scope.update = function (index) {
+        $scope.currentView = 3;
+        $scope.CurrentDevice = $scope.DeviceList[index];
+        console.log($scope.CurrentDevice);
+    };
     //Devolver el dispositivo
     $scope.free = function (currentDevice) {
-console.log(currentDevice);
+        console.log(currentDevice);
         $.ajax({url: 'http://localhost:8080/free',
             type: 'POST',
             data: {id: currentDevice.id,
-            idAsignation: currentDevice.asignationID
+                idAsignation: currentDevice.asignationID
             },
             success: function (result) {
-                $scope.load();   
+                $scope.load();
                 $scope.close();
             },
             error: function (result) {
@@ -139,9 +219,10 @@ console.log(currentDevice);
             }
         });
     };
-     $scope.setView = function (val) {
-         $scope.currentView=val;
-     }
+    $scope.setView = function (val) {
+        $scope.currentView = val;
+        $scope.load();
+    }
     //Agregar nuevo deispositivo 
     $scope.NewDevice = function () {
 
@@ -172,14 +253,38 @@ console.log(currentDevice);
             }
         });
     };
+    //Actualisa Dispocitivo
+    $scope.updateDevice = function () {
+        console.log($scope.CurrentDevice);
+        $.ajax({url: 'http://localhost:8080/updateDevice',
+            type: 'POST',
+            data: {
+                id: $scope.CurrentDevice.id,
+                code: $scope.CurrentDevice.feactures.code,
+                img: document.getElementById("prevUpdate").src,
+                brand: $scope.CurrentDevice.feactures.brand,
+                model: $scope.CurrentDevice.feactures.model,
+                os: $scope.CurrentDevice.feactures.os,
+                version: $scope.CurrentDevice.feactures.version,
+                ip: $scope.CurrentDevice.feactures.ip,
+                mac: $scope.CurrentDevice.feactures.mac},
+            success: function (result) {
+                $scope.CurrentDevice = "";
+                $scope.setView(0);
+            },
+            error: function (result) {
+                alert(" device not updated");
+            }
+        });
+    };
 
     //Asignacion de dispositivo
-    $scope.give = function (idDevice,idAsignation) {
+    $scope.give = function (idDevice, idAsignation) {
         $.ajax({url: 'http://localhost:8080/give',
             type: 'POST',
             data: {
                 idDevice: idDevice,
-                idAsignation:idAsignation
+                idAsignation: idAsignation
             },
             success: function (result) {
                 alert("Request Succesfull");
@@ -194,7 +299,7 @@ console.log(currentDevice);
 });
 //Filtra por prioridad
 app.filter('priorityOrder', function () {
-    function CustomOrder(item) { 
+    function CustomOrder(item) {
         switch (item) {
             case 'High':
                 return 1;
@@ -230,6 +335,16 @@ function readFile() {
             console.log(e.target.result);
             imagen = e.target.result;
             document.getElementById("prev").src = imagen;
+        });
+        FR.readAsDataURL(this.files[0]);
+    }
+}
+function readFileUpdate() {
+    if (this.files && this.files[0]) {
+        var FR = new FileReader();
+        FR.addEventListener("load", function (e) {
+            console.log(e.target.result);
+            document.getElementById("prevUpdate").src = e.target.result;
         });
         FR.readAsDataURL(this.files[0]);
     }
