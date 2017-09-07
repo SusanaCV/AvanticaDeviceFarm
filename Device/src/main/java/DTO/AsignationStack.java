@@ -28,10 +28,13 @@ public class AsignationStack {
 
    
     public int getTime() {
-        int time = (this.asignation.getTime() * 3600000);
-        long time2 = (int) new Date().getTime() ;
+        int time = (this.asignation.getTime() * 360000);//3600000
+        long time2 = new Date().getTime() ;
         long time3 = Long.parseLong(this.asignation.getStartDate(), 10)  ;
-        return time;
+        long time4 = time2-time3;
+        int time5 = (int) time4;
+        int time6= time-time5;
+        return time6;
     }
 
   

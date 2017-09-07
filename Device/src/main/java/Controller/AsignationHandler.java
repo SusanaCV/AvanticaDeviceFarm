@@ -48,19 +48,14 @@ public class AsignationHandler {
                                         object.setSend(true);
                                         System.out.println("send mail to " + object.getAsignation().getName() + " Need more time?");
 
-                                    } else if (object.getTime() <= 0) {
-                                        object.next();
-                                     
-
-                                        if (object.getAsignation().getStatus().equals("Pending")) {
-                                            sendMail(object.getAsignation(), "Device freed by " + object.getLastUserName());
-                                            System.out.println("send mail to " + object.getAsignation().getName() + " You have 5 min to claim device, last user " + object.getLastUserName());
-                                        }
-
-                                    } 
-                                    if (object.getTime() <= 0 && object.getAsignation().getStatus().equals("Take")) {
+                                    } else if (object.getTime() <= 0 ) {
                                         System.out.println("free time out");
                                         ConectionDB.free(object.getAsignation().getIdDevice(), object.getAsignation().getId());
+                                        setKick(object.getAsignation().getId(),false);
+                                        object.next();
+                                        sendMail(object.getAsignation(), "Device freed by " + object.getLastUserName());
+                                        System.out.println("send mail to " + object.getAsignation().getName() + " You have 5 min to claim device, last user " + object.getLastUserName());
+                                        setKick(object.getAsignation().getId(),true);
 
                                     }
                                 } else {
@@ -72,8 +67,9 @@ public class AsignationHandler {
                                         setKick(object.getAsignation().getId(),false);
                                    }else{
                                         System.out.println("Not started");
-                                        sendMail(object.getAsignation(), "Device available");
+                                        sendMail(object.getAsignation(), "You have 5 min to claim device");
                                         setKick(object.getAsignation().getId(),true);
+                                        object.next();
                                    }
                                    
                                 }
@@ -95,10 +91,13 @@ public class AsignationHandler {
             }
 
             private void setKick(int id, boolean add) {
-                if(add){
-                    toKick.add(id);
-                }else{
-                    toKick.remove(id);
+                try {
+                    if(add){
+                        toKick.add(id);
+                    }else{
+                        toKick.remove(id);
+                    }
+                } catch (Exception e) {
                 }
             }
 

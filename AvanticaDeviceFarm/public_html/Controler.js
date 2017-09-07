@@ -95,6 +95,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
 
     //Expandir Modal y cargar los datos
     $scope.expand = function (index) {
+        $scope.load();
         $scope.CurrentDevice = $scope.DeviceList[index];
         $scope.totalTime = 0;
         angular.forEach($scope.CurrentDevice.stack, function (item) {
