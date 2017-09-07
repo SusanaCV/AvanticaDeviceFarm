@@ -31,8 +31,8 @@ public class AsignationHandler {
                 while (true) {
                     try {
                         System.out.println("waint");
-                    //    Thread.sleep(300000);//5 minutes 
-                        Thread.sleep(1000);//5 minutes 
+                        Thread.sleep(300000);//5 minutes 
+                    //    Thread.sleep(10000);//5 minutes 
 
                         updateStack();
                         STACK.forEach((object) -> {

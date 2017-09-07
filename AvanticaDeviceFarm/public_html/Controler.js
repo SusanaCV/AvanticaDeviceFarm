@@ -95,14 +95,25 @@ app.controller("myCtrl", function ($scope, $window, $http) {
 
     //Expandir Modal y cargar los datos
     $scope.expand = function (index) {
-        $scope.load();
-        $scope.CurrentDevice = $scope.DeviceList[index];
-        $scope.totalTime = 0;
-        angular.forEach($scope.CurrentDevice.stack, function (item) {
-            $scope.totalTime = $scope.totalTime + item.time;
-        });
+        $.ajax({url: 'http://localhost:8080/device',
+            type: 'GET',
+            success: function (result) {
+                console.log(result);
+                $scope.DeviceList = result;
+                $scope.CurrentDevice = $scope.DeviceList[index];
+                $scope.totalTime = 0;
+                angular.forEach($scope.CurrentDevice.stack, function (item) {
+                    $scope.totalTime = $scope.totalTime + item.time;
+                });
 
-        document.getElementById('myModal').style.display = "block";
+                document.getElementById('myModal').style.display = "block";
+                $scope.$apply();
+            },
+            error: function (result) {
+                alert("Information not updated");
+            }
+        });
+        
     };
 
     //Cerrar modal
@@ -262,6 +273,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 ip: $scope.CurrentDevice.feactures.ip,
                 mac: $scope.CurrentDevice.feactures.mac},
             success: function (result) {
+                console.log(result);
                 $scope.CurrentDevice = "";
                 $scope.setView(0);
                 alert("The device was updated success");

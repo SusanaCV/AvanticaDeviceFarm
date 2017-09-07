@@ -268,7 +268,7 @@ public class ConectionDB {
                     + " Brand='" + brand + "',"
                     + " Model='" + model + "',"
                     + " Code='" + code + "',"
-                    + " Version='" + model + "',"
+                    + " Version='" + version + "',"
                     + " MAC_Address='" + mac + "',"
                     + " IP='" + ip + "',"
                     + " Image='" + img + " 'where Id_Device=" + id);
