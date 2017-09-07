@@ -38,7 +38,10 @@ and open the template in the editor.
                     <li  ng-if="Permission === 1" ng-click=" informs()">
                         <a  ><span class="glyphicon glyphicon-device"></span>Informs</a>
                     </li>  
-                    <li style="top:7px;">
+                    <li  ng-if="Permission === 1" ng-click=" loadUser()">
+                        <a  ><span class="glyphicon glyphicon-device"></span>Users</a>
+                    </li>  
+                    <li ng-if="currentView===0" style="top:7px;">
                         <input ng-model="$parent.search" type="text" class="form-control"  placeholder="Search">
                     </li>     
                 </ul>
@@ -176,7 +179,7 @@ and open the template in the editor.
             <div class="row" ng-if="currentView === 0" >
 
                 <div class="itemStyle col-sm-3" id="element{{$index}}"
-                     ng-repeat="item in DeviceList| filter : search  "
+                     ng-repeat="item in DeviceList| filter : { feactures:{model : search }}  "
                      >
 
                     <div style="overflow: hidden" ng-click="expand($index)">
@@ -192,87 +195,109 @@ and open the template in the editor.
                     </button>
 
                 </div>
-            </div>                
-        </div>
-        <!-- The Modal -->
-        <div  id="myModal" class="modal">
+            </div>       
+            <!-- users-->
+            <div class="row" ng-if="currentView === 6" >
+                <input ng-model="UserNameToFind" type="text" class="form-control"  placeholder="User name">
+                <div class="itemStyle col-sm-12" style="overflow: scroll; max-height: 80%"  >
+                    <table style="margin: auto">
+                         <tr >
+                        <td style="padding: 15px"> Name</td>
+                        <td style="padding: 15px"> Rol</td>
+                        <td style="padding: 15px"> Switch rol</td>
+                    </tr>
+                    <tr id="user{{$index}}" ng-repeat="item in userList| filter : UserNameToFind ">
+                        <td style="padding: 15px"> {{item.name}}</td>
+                        <td style="padding: 15px" ng-if="item.permission===1">Administrador</td>
+                        <td style="padding: 15px" ng-if="item.permission===0">Usuario</td>
+                        <td style="padding: 15px">
+                            <button ng-click="updateUser($index)" type="button" style="width: 100%;" ng-if="Permission === 1" class="btn btn-default btn-sm">
+                                Switch <span class="glyphicon glyphicon-sort"></span>  
+                            </button>
+                        </td>
+                    </tr>   
+                    </table>
+                </div>   
+            </div>
+            <!-- The Modal -->
+            <div  id="myModal" class="modal">
 
-            <!-- Modal content -->
-            <div class="modal-content">
-                <div ng-class="whatClassIsIt(CurrentDevice.status)" class="modal-header">
-                    <span ng-click="close()" class="close">&times;</span>
-                    <h2>Device Stack</h2>
-                </div>
-                <div class="modal-body">
-                    <div class="container">
+                <!-- Modal content -->
+                <div class="modal-content">
+                    <div ng-class="whatClassIsIt(CurrentDevice.status)" class="modal-header">
+                        <span ng-click="close()" class="close">&times;</span>
+                        <h2>Device Stack</h2>
+                    </div>
+                    <div class="modal-body">
+                        <div class="container">
 
-                        <div class="row" >
-                            <div class=" col-sm-3"  >
-                                <p class="textCenter"><b>{{CurrentDevice.name}}</b></p>
-                                <div >
-                                    <img alt=""  class="displayed"  src="{{CurrentDevice.src}}" style=" padding: auto;max-width: 200px">
+                            <div class="row" >
+                                <div class=" col-sm-3"  >
+                                    <p class="textCenter"><b>{{CurrentDevice.name}}</b></p>
+                                    <div >
+                                        <img alt=""  class="displayed"  src="{{CurrentDevice.src}}" style=" padding: auto;max-width: 200px">
 
-                                </div>
-                                <p class="textCenter"><b>{{CurrentDevice.status}}</b></p>
-                            </div>  
-                            <div class=" col-sm-3" >
-                                <p class=""><b>Feactures</b></p>
-                                <table class="table">
-                                    <tr  ng-repeat="(key, value) in CurrentDevice.feactures"><th><b>{{key+": "}}</b></th><th> {{ value}}</th></tr>                            
-                                </table>
+                                    </div>
+                                    <p class="textCenter"><b>{{CurrentDevice.status}}</b></p>
+                                </div>  
+                                <div class=" col-sm-3" >
+                                    <p class=""><b>Feactures</b></p>
+                                    <table class="table">
+                                        <tr  ng-repeat="(key, value) in CurrentDevice.feactures"><th><b>{{key+": "}}</b></th><th> {{ value}}</th></tr>                            
+                                    </table>
 
-                            </div>  
-                            <div class=" col-sm-2">
-                                <p class=""><b>Reservation</b></p>
-                                <input type="number" id="requestTime" placeholder="Time in hours" class="form-control" >
-                                <br>
-                                <select id="requestPriority" class="form-control">
-                                    <option value="High">High</option>
-                                    <option value="Medium">Medium</option>
-                                    <option value="Low">Low</option>
-                                </select>
-                                <br>
-                                <button type="button" ng-click="AsigMe()" class="btn btn-default btn-sm">
-                                    <span class="glyphicon glyphicon-ok"></span> Assign me 
-                                </button>
-                            </div>  
+                                </div>  
+                                <div class=" col-sm-2">
+                                    <p class=""><b>Reservation</b></p>
+                                    <input type="number" id="requestTime" placeholder="Time in hours" class="form-control" >
+                                    <br>
+                                    <select id="requestPriority" class="form-control">
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                    <br>
+                                    <button type="button" ng-click="AsigMe()" class="btn btn-default btn-sm">
+                                        <span class="glyphicon glyphicon-ok"></span> Assign me 
+                                    </button>
+                                </div>  
 
-                            <div class=" col-sm-3">
-                                <p class=""><b>Stack</b></p>
+                                <div class=" col-sm-3">
+                                    <p class=""><b>Stack</b></p>
 
-                                <table class="table" ng-repeat=" stack in CurrentDevice.stack| priorityOrder : priority" >
-                                    <tr >
-                                        <th>{{"Name: "+stack.name}}</th>
-                                    </tr>  
-                                    <tr >
-                                        <th>{{"Time: "+stack.time + " hours"}}</th>
-                                    </tr>  
-                                    <tr >
-                                        <th>{{"Priority: "+stack.priority}}</th>
-                                    </tr>  
-                                    <tr >
-                                        <th>{{"Date: "+ (stack.resquetDate | date:'yyyy-MM-dd HH:mm:ss ') }}</th>
-                                    </tr>  
-                                    <tr ng-if="stack.name === user && stack.status === 'Take' && stack.id === CurrentDevice.asignationID" >
-                                        <th  ><input class="btn" type="button" ng-click="give(CurrentDevice.id, stack.id)" value="Add" ></th>
-                                    </tr>    
-                                    <tr ng-if="stack.name === user && stack.status === 'Given' && stack.id === CurrentDevice.asignationID" >
-                                        <th  >
-                                            <button  ng-click="free(CurrentDevice)" type="button" style="width: 100%;" class="btn btn-default btn-sm">
-                                                Return <span class="glyphicon glyphicon-transfer"></span>  
-                                            </button>
-                                        </th>
-                                    </tr>
+                                    <table class="table" ng-repeat=" stack in CurrentDevice.stack| priorityOrder : priority" >
+                                        <tr >
+                                            <th>{{"Name: "+stack.name}}</th>
+                                        </tr>  
+                                        <tr >
+                                            <th>{{"Time: "+stack.time + " hours"}}</th>
+                                        </tr>  
+                                        <tr >
+                                            <th>{{"Priority: "+stack.priority}}</th>
+                                        </tr>  
+                                        <tr >
+                                            <th>{{"Date: "+ (stack.resquetDate | date:'yyyy-MM-dd HH:mm:ss ') }}</th>
+                                        </tr>  
+                                        <tr ng-if="stack.name === user && stack.status === 'Take' && stack.id === CurrentDevice.asignationID" >
+                                            <th  ><input class="btn" type="button" ng-click="give(CurrentDevice.id, stack.id)" value="Add" ></th>
+                                        </tr>    
+                                        <tr ng-if="stack.name === user && stack.status === 'Given' && stack.id === CurrentDevice.asignationID" >
+                                            <th  >
+                                                <button  ng-click="free(CurrentDevice)" type="button" style="width: 100%;" class="btn btn-default btn-sm">
+                                                    Return <span class="glyphicon glyphicon-transfer"></span>  
+                                                </button>
+                                            </th>
+                                        </tr>
 
-                                </table>
+                                    </table>
+                                </div> 
                             </div> 
-                        </div> 
+                        </div>
+                    </div>
+                    <div ng-class="whatClassIsIt(CurrentDevice.status)" class="modal-footer">
+                        <h3>Device {{CurrentDevice.feactures.code}} available in {{totalTime}} hours</h3>
                     </div>
                 </div>
-                <div ng-class="whatClassIsIt(CurrentDevice.status)" class="modal-footer">
-                    <h3>Device {{CurrentDevice.feactures.code}} available in {{totalTime}} hours</h3>
-                </div>
-            </div>
-        </div> 
+            </div> 
     </body>
 </html>

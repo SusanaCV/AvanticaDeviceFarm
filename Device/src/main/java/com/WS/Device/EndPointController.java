@@ -46,10 +46,18 @@ public class EndPointController {
 
         return ResponseEntity.ok(list);
     }
+    
+    @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/loadUser", method = RequestMethod.GET)
+    public @ResponseBody
+    ResponseEntity<ArrayList> users() {
+        ArrayList<User> list = ConectionDB.LoadUser();
+
+        return ResponseEntity.ok(list);
+    }
 
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/request", method = RequestMethod.POST)
-
     public @ResponseBody
     ResponseEntity<ArrayList> request(
             @RequestParam(value = "idUser", defaultValue = "-1") int idUser,
@@ -67,6 +75,28 @@ public class EndPointController {
         return ResponseEntity.ok(null);
     }
 
+       @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/switch", method = RequestMethod.POST)
+    public @ResponseBody
+    ResponseEntity<Boolean> switchF(
+            @RequestParam(value = "id", defaultValue = "-1") int id,
+            @RequestParam(value = "permission", defaultValue = "-1") int permission
+    ) {
+        if (id == -1 || permission == -1) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        if(permission==0){
+            permission=1;
+        }else if (permission==1){
+            permission=0;
+        }
+        if (!ConectionDB.switchF(id,permission)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        }
+        return ResponseEntity.ok(true);
+    }
+    
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/give", method = RequestMethod.POST)
 

@@ -24,11 +24,11 @@ public class User {
         this.Email = Email;
     }
 
-    public int getPermision() {
+    public int getPermission() {
         return Permission;
     }
 
-    public void setPermision(int permision) {
+    public void setPermission(int permision) {
         this.Permission = permision;
     }
 

@@ -90,6 +90,30 @@ public class ConectionDB {
         return true;
     }
 
+    public static ArrayList<User> LoadUser() {
+        open();
+        ArrayList<User> list = new ArrayList();
+        try {
+            ResultSet resultSet = statement.executeQuery("select * from users");
+            while (resultSet.next()) {
+                list.add(new User(resultSet.getInt("ID_User"),
+                        resultSet.getInt("Permission"),
+                        resultSet.getString("Name"),
+                        resultSet.getString("Usuario_Skype"),
+                        resultSet.getString("Email")));
+            }
+            close();
+
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            close();
+
+            return null;
+        }
+
+    }
+
     public static ArrayList<Device> getDevicesList() {
         open();//Conexion con base de datos
         ArrayList<Device> list = new ArrayList();
@@ -214,7 +238,7 @@ public class ConectionDB {
                     "INSERT INTO users( Permission, Name, Usuario_Skype, Email, Password) "
                     + "VALUES (" + permission + ",'" + name + "','" + skype + "','" + email + "')");
         } catch (Exception e) {
-
+            
         }
         close();
     }
@@ -297,10 +321,10 @@ public class ConectionDB {
 
                 ArrayList<Inform> series = new ArrayList();
                 while (resultSetStack.next()) {
-                    id=resultSetStack.getInt("Id_Device");
+                    id = resultSetStack.getInt("Id_Device");
                     Inform NNI = new Inform(resultSetStack.getString("Brand") + " " + resultSetStack.getString("model"));
                     Statement statement3 = connect.createStatement();
-                    ResultSet resultSet3 = statement3.executeQuery("SELECT Month, Count FROM informs WHERE year="+NI.getYear() +" and id_device="+id);
+                    ResultSet resultSet3 = statement3.executeQuery("SELECT Month, Count FROM informs WHERE year=" + NI.getYear() + " and id_device=" + id);
                     while (resultSet3.next()) {
                         NNI.getData().set(resultSet3.getInt("Month"), resultSet3.getInt("Count"));
                     }
@@ -316,5 +340,20 @@ public class ConectionDB {
         close();
 
         return list;
+    }
+
+    public static boolean switchF(int id, int permission) {
+        open();
+        try {
+            statement.executeUpdate(
+                    "Update users set Permission=" + permission + " where ID_User=" + id);
+
+            close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            close();
+            return false;
+        }
     }
 }

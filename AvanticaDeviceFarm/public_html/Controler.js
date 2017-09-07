@@ -6,17 +6,35 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     $scope.id = 0;
     $scope.currentView = 0;
     $scope.DeviceList = [];
+    $scope.userList = [{name: "asdf", permission: 0}, {name: "admi", permission: 1}]
     $scope.InformsList = [];
     $scope.lock = false;
 
-    //Endpoint de dispositivos
-    $scope.load = function () {
-          $.ajax({url: 'http://localhost:8080/device',
+    //Endpoint de usuarios
+    $scope.loadUser = function () {
+        $scope.setView(6);
+        $.ajax({url: 'http://localhost:8080/loadUser',
             type: 'GET',
             success: function (result) {
-                    console.log(result);
-                    $scope.DeviceList = result;
-                    
+                console.log(result);
+                $scope.userList = result;
+
+                $scope.$apply();
+            },
+            error: function (result) {
+                alert("users not found");
+            }
+        });
+    };
+
+    //Endpoint de dispositivos
+    $scope.load = function () {
+        $.ajax({url: 'http://localhost:8080/device',
+            type: 'GET',
+            success: function (result) {
+                console.log(result);
+                $scope.DeviceList = result;
+
                 $scope.$apply();
             },
             error: function (result) {
@@ -27,12 +45,12 @@ app.controller("myCtrl", function ($scope, $window, $http) {
 
     //Endpoint de dispositivos
     $scope.informs = function () {
-         $.ajax({url: 'http://localhost:8080/informs',
+        $.ajax({url: 'http://localhost:8080/informs',
             type: 'GET',
             success: function (result) {
-                    console.log(result);
-                    $scope.InformsList = result;                    
-                    $scope.setView(4);
+                console.log(result);
+                $scope.InformsList = result;
+                $scope.setView(4);
             },
             error: function (result) {
                 alert("Informs not found");
@@ -40,25 +58,44 @@ app.controller("myCtrl", function ($scope, $window, $http) {
         });
     };
 
+    $scope.updateUser = function (index) {
+        console.log(index);
+        console.log($scope.userList[index]);
+        $.ajax({url: 'http://localhost:8080/switch',
+            type: 'POST',
+            data: {id: $scope.userList[index].id,
+                permission: $scope.userList[index].permission},
+            success: function (result) {
+                $scope.loadUser();
+            },
+            error: function (result) {
+
+                $scope.lock = false;
+                alert("User not updated");
+            }
+        });
+    };
+
+
     //Endpoint Login
     $scope.login = function () {
-        $scope.lock=true;
+        $scope.lock = true;
         $.ajax({url: 'http://localhost:8080/login',
             type: 'GET',
             data: {username: document.getElementById("user").value,
                 password: document.getElementById("pass").value},
             success: function (result) {
-                
-                $scope.lock=false;
+
+                $scope.lock = false;
                 console.log("log");
                 $scope.user = result.name;
                 $scope.id = result.id;
-                $scope.Permission = result.permision;
+                $scope.Permission = result.permission;
                 $scope.load();
             },
             error: function (result) {
-                
-                $scope.lock=false;
+
+                $scope.lock = false;
                 alert("Data not found");
             }
         });
@@ -113,7 +150,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 alert("Information not updated");
             }
         });
-        
+
     };
 
     //Cerrar modal
@@ -250,7 +287,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 document.getElementById("mac").value = "";
                 $scope.load();
                 alert("The device was inserted success");
-                
+
             },
             error: function (result) {
                 alert("New device not insert");
@@ -306,8 +343,8 @@ app.controller("myCtrl", function ($scope, $window, $http) {
 app.directive('myEnter', function () {
     return function (scope, element, attrs) {
         element.bind("keydown keypress", function (event) {
-            if(event.which === 13) {
-                scope.$apply(function (){
+            if (event.which === 13) {
+                scope.$apply(function () {
                     scope.$eval(attrs.myEnter);
                 });
 
