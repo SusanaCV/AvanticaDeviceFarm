@@ -16,13 +16,17 @@ and open the template in the editor.
         <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
         <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-        <title>TODO supply a title</title>
+        <title>Avantica Devices Farm</title>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
     </head>
     <body  ng-app="myApp" ng-controller="myCtrl">
+        <!--screen lock-->
+        <div style="position: fixed;height: 100%;top: 0px;left: 0px; width: 100%;background: rgba(100, 100, 100, 0.1);;z-index: 99; " ng-if="lock">
+
+        </div>
         <!--nav bar-->
-        <nav ng-if="user !== ''" class="navbar navbar-inverse">
+        <nav ng-if="user !== ''" class="navbar navbar-inverse" style="background: #2F2D46 !important">
             <div class="container-fluid">
                 <div class="navbar-header">
                     <a class="navbar-brand" ng-click=" setView(0); load();">Device Farm</a>
@@ -31,7 +35,7 @@ and open the template in the editor.
                     <li  ng-if="Permission === 1" ng-click=" setView(1)">
                         <a  ><span class="glyphicon glyphicon-device"></span>Add Device</a>
                     </li>  
-                    <li  ng-if="Permission === 1" ng-click=" setView(4)">
+                    <li  ng-if="Permission === 1" ng-click=" informs()">
                         <a  ><span class="glyphicon glyphicon-device"></span>Informs</a>
                     </li>  
                     <li style="top:7px;">
@@ -39,11 +43,13 @@ and open the template in the editor.
                     </li>     
                 </ul>
                 <ul class="nav navbar-nav navbar-right">
-                    <li>
-                        <a  ><span class="glyphicon glyphicon-user"></span>{{" " + user}}</a>
-                    </li>
-                    <li ng-click="logout()">
-                        <a  ><span class="glyphicon glyphicon-log-out"></span> LogOut</a>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown"><span class="glyphicon glyphicon-user"></span>{{" " + user}}</a>
+                        <ul class="dropdown-menu">
+                            <li ng-click="logout()">
+                                <a  ><span class="glyphicon glyphicon-log-out"></span> LogOut</a>
+                            </li>
+                        </ul>
                     </li>
                 </ul>
             </div>
@@ -51,7 +57,7 @@ and open the template in the editor.
         <!--Graphics-->
         <div class="row" ng-if="currentView === 4">
             <div class="itemStyle col-sm-12" ng-if="Permission === 1">
-            <h3>Select Year</h3>
+                <h3>Select Year</h3>
                 <select class="form-control" ng-options="inform.year  for inform in InformsList" 
                         ng-model="item" ng-change="DATA(item)">
                 </select>
@@ -59,7 +65,7 @@ and open the template in the editor.
             </div>
         </div>
         <!--LOGIN-->
-        <div ng-if="user === ''" class="modal-dialog">
+        <div ng-if="user === ''" class="modal-dialog" my-enter="login()">
             <div class="loginmodal-container">
                 <h1>Login to Your Account</h1>
 
@@ -67,7 +73,7 @@ and open the template in the editor.
                 <form>
                     <input type="text" value="" id="user" placeholder="Email">
                     <input type="password" value="" id="pass" placeholder="Password">
-                    <input type="submit" name="login" ng-click="login()" class="login loginmodal-submit" value="Login">
+                    <input type="button" name="login" ng-click="login()" class="btn loginmodal-submit" value="Login">
                 </form>
 
             </div>
@@ -115,7 +121,7 @@ and open the template in the editor.
                             <th>MAC Adress:</th><th><input id="mac" type="text"   ></th>
                         </tr>
                         <tr>
-                            <th></th><th><input type="button" ng-click="NewDevice()" class="btn btn-primary" value="Add"  ></th>
+                            <th><input type="button" ng-click="setView(0)" class="btn btn-danger" value="Cancel"></th><th><input type="button" ng-click="NewDevice()" class="btn btn-primary" value="Add"  ></th>
                         </tr>
                     </table>
                 </div>
@@ -161,7 +167,7 @@ and open the template in the editor.
                             <th>MAC Adress:</th><th><input ng-model="CurrentDevice.feactures.mac"  type="text"   ></th>
                         </tr>
                         <tr>
-                            <th></th><th><input type="button" ng-click="updateDevice()" class="btn btn-primary" value="Update"></th>
+                            <th><input type="button" ng-click="setView(0)" class="btn btn-danger" value="Cancel"><th><input type="button" ng-click="updateDevice()" class="btn btn-primary" value="Update"></th>
                         </tr>
                     </table>
                 </div>
@@ -169,14 +175,13 @@ and open the template in the editor.
             <!-- Device Farm-->
             <div class="row" ng-if="currentView === 0" >
 
-
                 <div class="itemStyle col-sm-3" id="element{{$index}}"
                      ng-repeat="item in DeviceList| filter : search  "
                      >
 
-                    <div ng-click="expand($index)">
-                        <p class=" textCenter"><b>{{item.feactures.code + "[" + item.feactures.brand + " " + item.feactures.model + "]"}}</b></p>
-                        <img   class="col-sm-12" alt="" src="{{item.src}}">
+                    <div style="overflow: hidden" ng-click="expand($index)">
+                        <p class=" textCenter"><b>{{item.feactures.model}}</b></p>
+                        <img style=";max-height: 150px;width: auto;mix-height:150px "  alt="" src="{{item.src}}">
                         <p class="textCenter"><b>{{item.status}}</b>{{" " + item.name}}</p> 
                     </div>     
                     <button ng-click="update($index)" type="button" style="width: 100%;" ng-if="Permission === 1" class="btn btn-default btn-sm">
@@ -228,7 +233,7 @@ and open the template in the editor.
                                 </select>
                                 <br>
                                 <button type="button" ng-click="AsigMe()" class="btn btn-default btn-sm">
-                                    <span class="glyphicon glyphicon-ok"></span> Asing me 
+                                    <span class="glyphicon glyphicon-ok"></span> Assign me 
                                 </button>
                             </div>  
 
@@ -243,10 +248,10 @@ and open the template in the editor.
                                         <th>{{"Time: "+stack.time + " hours"}}</th>
                                     </tr>  
                                     <tr >
-                                        <th>{{"priority: "+stack.priority}}</th>
+                                        <th>{{"Priority: "+stack.priority}}</th>
                                     </tr>  
                                     <tr >
-                                        <th>{{"resquet date: "+ (stack.resquetDate | date:'yyyy-MM-dd HH:mm:ss ') }}</th>
+                                        <th>{{"Date: "+ (stack.resquetDate | date:'yyyy-MM-dd HH:mm:ss ') }}</th>
                                     </tr>  
                                     <tr ng-if="stack.name === user && stack.status === 'Take' && stack.id === CurrentDevice.asignationID" >
                                         <th  ><input class="btn" type="button" ng-click="give(CurrentDevice.id, stack.id)" value="Add" ></th>
@@ -265,7 +270,7 @@ and open the template in the editor.
                     </div>
                 </div>
                 <div ng-class="whatClassIsIt(CurrentDevice.status)" class="modal-footer">
-                    <h3>Divice {{CurrentDevice.feactures.code}} available in {{totalTime}} hours</h3>
+                    <h3>Device {{CurrentDevice.feactures.code}} available in {{totalTime}} hours</h3>
                 </div>
             </div>
         </div> 

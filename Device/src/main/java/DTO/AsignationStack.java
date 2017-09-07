@@ -28,7 +28,10 @@ public class AsignationStack {
 
    
     public int getTime() {
-        return ((this.asignation.getTime() * 3600000) - (int) (new Date().getTime() -Long.parseLong(this.asignation.getStartDate(), 10) )) / 1000;
+        int time = (this.asignation.getTime() * 3600000);
+        long time2 = (int) new Date().getTime() ;
+        long time3 = Long.parseLong(this.asignation.getStartDate(), 10)  ;
+        return time;
     }
 
   

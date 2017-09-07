@@ -55,25 +55,25 @@ public class SendHTMLEmail {
             Message msg = new MimeMessage(session);
 
             // -- Set the FROM and TO fields --
-            msg.setFrom(new InternetAddress("valverde.alfaro.jimmy@gmail.com"));
+            msg.setFrom(new InternetAddress("susanacorrales03@gmail.com"));
             msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(to));
-            msg.setSubject("Hello");
+            msg.setSubject("Asignation Device Farm");
             msg.setContent(
                     "<div " + style + " >"
-                    + "	<h1 style=\"width:100%;\" align=\"center\" >Hola "+name+"</h1> <br>"
+                    + "	<h1 style=\"width:100%;\" align=\"center\" >Hello "+name+"</h1> <br>"
                   //  + "	<img style=\"width:40%;height:auto; float: left;margin: 0 20px 20px 0;\" src=\"http://images.samsung.com/is/image/samsung/p5/mx/smartphones/mx_SM-N920GZSATCE_001_Front_silver.png?$ORIGIN_PNG$\">"
                     + "	<p style=\"font-size:18px ;text-align: justify;\">" + message
-                    + "\n Has click <a href=\"http://localhost:8383/AvanticaDeviceFarm/index.html\" target=\"_blank\">aqui</a> para acceder a nuestra pagina web</p>"
+                    + ", It is a pleasure to use our service, click <a href=\"http://localhost:8383/AvanticaDeviceFarm/index.html\" target=\"_blank\">here</a>  to access our website</p>"
                     + "<br><br><br>"
                     + "	<table>"
                     + "		<tr>"
-                    + "             <td><b>Device farm service</b></td>"
+                    + "             <td><b>Device Farm Service</b></td>"
                     + "		</tr>"
                     + "		<tr>"
-                    + "             <td>phone: CR 506.xxxx.xxxx | x xxxx</td>"
+                    + "             <td>Phone: CR (506) 24610461</td>"
                     + "		</tr>"
                     + "		<tr>"
-                    + "             <td>skype: xxx.xx</td>"
+                    + "             <td>Email: info@avantica.net</td>"
                     + "		</tr>"
                     + "		<tr>"
                     + "             <td><a href=\"www.avantica.net\" target=\"_blank\">www.avantica.net</a></td>"

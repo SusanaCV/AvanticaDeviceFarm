@@ -4,17 +4,11 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     $scope.totalTime = 0;
     $scope.user = "";
     $scope.id = 0;
-    $scope.yearIndex = 0;
     $scope.currentView = 0;
     $scope.DeviceList = [];
     $scope.InformsList = [];
+    $scope.lock = false;
 
-
-
-    $scope.print = function () {
-
-        console.log($scope.asd);
-    };
     //Endpoint de dispositivos
     $scope.load = function () {
           $.ajax({url: 'http://localhost:8080/device',
@@ -22,7 +16,8 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             success: function (result) {
                     console.log(result);
                     $scope.DeviceList = result;
-                    $scope.informs();
+                    
+                $scope.$apply();
             },
             error: function (result) {
                 alert("Devices not found");
@@ -36,7 +31,8 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             type: 'GET',
             success: function (result) {
                     console.log(result);
-                    $scope.InformsList = result;
+                    $scope.InformsList = result;                    
+                    $scope.setView(4);
             },
             error: function (result) {
                 alert("Informs not found");
@@ -46,18 +42,23 @@ app.controller("myCtrl", function ($scope, $window, $http) {
 
     //Endpoint Login
     $scope.login = function () {
+        $scope.lock=true;
         $.ajax({url: 'http://localhost:8080/login',
             type: 'GET',
             data: {username: document.getElementById("user").value,
                 password: document.getElementById("pass").value},
             success: function (result) {
+                
+                $scope.lock=false;
+                console.log("log");
                 $scope.user = result.name;
                 $scope.id = result.id;
                 $scope.Permission = result.permision;
                 $scope.load();
-                $scope.apply();
             },
             error: function (result) {
+                
+                $scope.lock=false;
                 alert("Data not found");
             }
         });
@@ -148,26 +149,15 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             }
         });
     };
-    $scope.DATA = function (index) {
-        $scope.yearIndex = $scope.InformsList.indexOf(index);
-
-        /*  $.ajax({url: 'http://localhost:8080/delete',
-         type: 'POST',
-         data: {id: $scope.DeviceList[index].id},
-         success: function (result) {
-         $scope.load();
-         },
-         error: function (result) {
-         alert("delete fail");
-         }
-         });*/ 
+    $scope.DATA = function (item) {
+        console.log(item);
         $('#container').highcharts({
             title: {
                 text: 'Device Usage',
                 x: -20 //center
             },
             subtitle: {
-                text: $scope.InformsList[$scope.yearIndex].year,
+                text: item.year,
                 x: -20
             },
             xAxis: {
@@ -193,7 +183,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 verticalAlign: 'middle',
                 borderWidth: 0
             },
-            series: $scope.InformsList[$scope.yearIndex].series
+            series: item.series
         });
     };
     //go to update
@@ -222,7 +212,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
     $scope.setView = function (val) {
         $scope.currentView = val;
         $scope.load();
-    }
+    };
     //Agregar nuevo deispositivo 
     $scope.NewDevice = function () {
 
@@ -247,6 +237,8 @@ app.controller("myCtrl", function ($scope, $window, $http) {
                 document.getElementById("ip").value = "";
                 document.getElementById("mac").value = "";
                 $scope.load();
+                alert("The device was inserted success");
+                
             },
             error: function (result) {
                 alert("New device not insert");
@@ -271,6 +263,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             success: function (result) {
                 $scope.CurrentDevice = "";
                 $scope.setView(0);
+                alert("The device was updated success");
             },
             error: function (result) {
                 alert(" device not updated");
@@ -293,6 +286,19 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             },
             error: function (result) {
                 alert("Request Failed");
+            }
+        });
+    };
+});
+app.directive('myEnter', function () {
+    return function (scope, element, attrs) {
+        element.bind("keydown keypress", function (event) {
+            if(event.which === 13) {
+                scope.$apply(function (){
+                    scope.$eval(attrs.myEnter);
+                });
+
+                event.preventDefault();
             }
         });
     };
@@ -322,7 +328,7 @@ app.filter('priorityOrder', function () {
 });
 window.onclick = function (event) {
     var modal = document.getElementById('myModal');
-    if (event.target == modal) {
+    if (event.target === modal) {
         modal.style.display = "none";
     }
 

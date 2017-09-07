@@ -16,11 +16,11 @@ th label{
    width: 100%; 
 }
 body{
-    background: gray !important;
+    background: #454685 !important;
 }
 .itemStyle{
     background: white;
-    border: solid 10px grey;
+    border: solid 10px #454685;
     padding: 10px;
     border-radius: 20px;
 }

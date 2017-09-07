@@ -31,26 +31,30 @@ public class AsignationHandler {
                 while (true) {
                     try {
                         System.out.println("waint");
-                        Thread.sleep(300000);//  5 minutes 
+                    //    Thread.sleep(300000);//5 minutes 
+                        Thread.sleep(1000);//5 minutes 
 
                         updateStack();
                         STACK.forEach((object) -> {
                             if (object.getAsignation() != null) {
-                                System.out.println(object.getTime());
+                                System.out.println(object.getAsignation().getName());
                                 if (!object.getAsignation().getStartDate().equals("0")) {
-
+                                    if(isKick(object.getAsignation().getId())){
+                                        setKick(object.getAsignation().getId(),false);
+                                    }
+                                    System.out.println(object.getTime());
                                     if (object.getAsignation().getStatus().equals("Given") && !object.isSend() && object.getTime() <= 300000 && object.getTime() > 0) {
-                                        sendMail(object.getAsignation(), "need more time?");
+                                        sendMail(object.getAsignation(), "Need more time?");
                                         object.setSend(true);
-                                        System.out.println("send mail to " + object.getAsignation().getName() + " need more time?");
+                                        System.out.println("send mail to " + object.getAsignation().getName() + " Need more time?");
 
                                     } else if (object.getTime() <= 0) {
                                         object.next();
                                      
 
                                         if (object.getAsignation().getStatus().equals("Pending")) {
-                                            sendMail(object.getAsignation(), "device freed by " + object.getLastUserName());
-                                            System.out.println("send mail to " + object.getAsignation().getName() + " you have 5 min to claim device, last user " + object.getLastUserName());
+                                            sendMail(object.getAsignation(), "Device freed by " + object.getLastUserName());
+                                            System.out.println("send mail to " + object.getAsignation().getName() + " You have 5 min to claim device, last user " + object.getLastUserName());
                                         }
 
                                     } 
@@ -60,11 +64,17 @@ public class AsignationHandler {
 
                                     }
                                 } else {
-                                   
+                                   if(isKick(object.getAsignation().getId())){
+                                        System.out.println("free time out");
+                                        
+                                        sendMail(object.getAsignation(), "You loss you chance to pick the device");
+                                        ConectionDB.free(object.getAsignation().getIdDevice(), object.getAsignation().getId());   
+                                        setKick(object.getAsignation().getId(),false);
+                                   }else{
                                         System.out.println("Not started");
-                                        sendMail(object.getAsignation(), "device available");
-                                        object.next();
-                                       
+                                        sendMail(object.getAsignation(), "Device available");
+                                        setKick(object.getAsignation().getId(),true);
+                                   }
                                    
                                 }
                             }
@@ -72,6 +82,23 @@ public class AsignationHandler {
                     } catch (Exception ex) {
                         Logger.getLogger(AsignationHandler.class.getName()).log(Level.SEVERE, null, ex);
                     }
+                }
+            }
+            private ArrayList<Integer> toKick=new ArrayList<>();
+            private boolean isKick(int id) {
+                for (Integer integer : toKick) {
+                    if(id==integer){
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            private void setKick(int id, boolean add) {
+                if(add){
+                    toKick.add(id);
+                }else{
+                    toKick.remove(id);
                 }
             }
 
