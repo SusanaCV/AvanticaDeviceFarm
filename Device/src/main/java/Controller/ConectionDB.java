@@ -356,4 +356,19 @@ public class ConectionDB {
             return false;
         }
     }
+
+    public static boolean MoreTime(int id, int time) {
+        open();
+        try {
+            statement.executeUpdate(
+                    "Update asignation set time=time+" + time + " where Id_Asignation=" + id);
+
+            close();
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            close();
+            return false;
+        }
+    }
 }

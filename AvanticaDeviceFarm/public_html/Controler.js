@@ -258,6 +258,24 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             }
         });
     };
+    
+    //Devolver el dispositivo
+    $scope.moreTime = function (currentDevice) {
+        console.log(currentDevice);
+        $.ajax({url: 'http://localhost:8080/moreTime',
+            type: 'POST',
+            data: {id: currentDevice.asignationID,
+                time: document.getElementById("moreTime").value
+            },
+            success: function (result) {
+                $scope.load();
+                $scope.close();
+            },
+            error: function (result) {
+                alert("time not registred");
+            }
+        });
+    };
     $scope.setView = function (val) {
         $scope.currentView = val;
         $scope.load();

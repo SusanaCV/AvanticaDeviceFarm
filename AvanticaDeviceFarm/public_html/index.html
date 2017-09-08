@@ -288,6 +288,19 @@ and open the template in the editor.
                                                 </button>
                                             </th>
                                         </tr>
+                                        
+                                        <tr ng-if="stack.name === user && stack.status === 'Given' && stack.id === CurrentDevice.asignationID" >
+                                            <th  >
+                                                <input type="number" id="moreTime" placeholder="More time in hours" class="form-control" >
+                                            </th>
+                                        </tr>                                        
+                                        <tr ng-if="stack.name === user && stack.status === 'Given' && stack.id === CurrentDevice.asignationID" >
+                                            <th  >
+                                                <button  ng-click="moreTime(CurrentDevice)" type="button" style="width: 100%;" class="btn btn-default btn-sm">
+                                                    More time <span class="glyphicon glyphicon-plus"></span>  
+                                                </button>
+                                            </th>
+                                        </tr>
 
                                     </table>
                                 </div> 

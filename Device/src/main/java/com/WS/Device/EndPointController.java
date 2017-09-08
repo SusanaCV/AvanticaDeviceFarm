@@ -97,6 +97,23 @@ public class EndPointController {
         return ResponseEntity.ok(true);
     }
     
+       @CrossOrigin(origins = "*")
+    @RequestMapping(value = "/moreTime", method = RequestMethod.POST)
+    public @ResponseBody
+    ResponseEntity<Boolean> moreTime(
+            @RequestParam(value = "id", defaultValue = "-1") int id,
+            @RequestParam(value = "time", defaultValue = "-1") int time
+    ) {
+        if (id == -1 || time == -1) {
+
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
+        }
+        if (!ConectionDB.MoreTime(id,time)) {
+            return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(null);
+        }
+        return ResponseEntity.ok(true);
+    }
+    
     @CrossOrigin(origins = "*")
     @RequestMapping(value = "/give", method = RequestMethod.POST)
 
