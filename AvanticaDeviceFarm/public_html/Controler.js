@@ -79,6 +79,9 @@ app.controller("myCtrl", function ($scope, $window, $http) {
 
     //Endpoint Login
     $scope.login = function () {
+        if($scope.lock){
+            return;
+        }
         $scope.lock = true;
         $.ajax({url: 'http://localhost:8080/login',
             type: 'GET',
