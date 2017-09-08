@@ -96,6 +96,7 @@ app.controller("myCtrl", function ($scope, $window, $http) {
             error: function (result) {
 
                 $scope.lock = false;
+                $scope.$apply();
                 alert("Data not found");
             }
         });
